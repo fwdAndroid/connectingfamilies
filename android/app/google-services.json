@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "857332039763",
+    "project_id": "connectingfamilies-13936",
+    "storage_bucket": "connectingfamilies-13936.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857332039763:android:559559c91ed381b9a9c6a6",
+        "android_client_info": {
+          "package_name": "com.connecting.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbxvszFWhYZ2VdqKRaJpZ5ZRFU242eg4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

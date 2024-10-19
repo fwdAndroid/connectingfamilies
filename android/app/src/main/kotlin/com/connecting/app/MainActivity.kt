@@ -1,4 +1,4 @@
-package com.example.connectingfamilies
+package com.connecting.app
 
 import io.flutter.embedding.android.FlutterActivity
 
