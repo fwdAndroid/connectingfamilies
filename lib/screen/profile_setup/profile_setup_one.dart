@@ -7,7 +7,20 @@ import 'package:group_button/group_button.dart';
 import 'package:intl/intl.dart';
 
 class ProfileSetupOne extends StatefulWidget {
-  const ProfileSetupOne({super.key});
+  final image;
+  final phoneNumber;
+  final confrimPassword;
+  final password;
+  final fullName;
+  final email;
+  const ProfileSetupOne(
+      {super.key,
+      required this.confrimPassword,
+      required this.email,
+      required this.fullName,
+      required this.image,
+      required this.password,
+      required this.phoneNumber});
 
   @override
   State<ProfileSetupOne> createState() => _ProfileSetupOneState();

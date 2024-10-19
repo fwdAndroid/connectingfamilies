@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_one.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
+import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,16 +21,16 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _reenterController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController _fullNameController = TextEditingController();
-  bool isChecked = false;
   bool passwordVisible = false;
   bool isLoading = false;
-  bool isGoogle = false;
 
   @override
   void initState() {
     super.initState();
     passwordVisible = true;
   }
+
+  Uint8List? image;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +63,20 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 195,
                 ),
               ),
+            ),
+            GestureDetector(
+              onTap: () => selectImage(),
+              child: image != null
+                  ? CircleAvatar(
+                      radius: 59, backgroundImage: MemoryImage(image!))
+                  : GestureDetector(
+                      onTap: () => selectImage(),
+                      child: Image.asset(
+                        "assets/photo.png",
+                        width: 226,
+                        height: 195,
+                      ),
+                    ),
             ),
             Column(
               children: [
@@ -248,6 +266,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: const EdgeInsets.all(8),
                   child: TextFormField(
                     controller: phoneController,
+                    keyboardType: TextInputType.number,
                     style: GoogleFonts.poppins(color: black),
                     decoration: InputDecoration(
                         prefixIcon: Icon(
@@ -272,12 +291,37 @@ class _SignupScreenState extends State<SignupScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SaveButton(
-                  title: "Register",
+                  title: "Next",
                   onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => ProfileSetupOne()));
+                    if (image == null) {
+                      showMessageBar("Photo is Required", context);
+                    } else if (_fullNameController.text.isEmpty) {
+                      showMessageBar("User Name is Required", context);
+                    } else if (_emailController.text.isEmpty) {
+                      showMessageBar("Email is Required", context);
+                    } else if (_passwordController.text.isEmpty) {
+                      showMessageBar("Password is Required", context);
+                    } else if (_reenterController.text.isEmpty) {
+                      showMessageBar("Confirm Password is Required", context);
+                    } else if (phoneController.text.isEmpty) {
+                      showMessageBar("Contact Number is Required ", context);
+                    } else {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => ProfileSetupOne(
+                                    image: image,
+                                    phoneNumber: phoneController.text.trim(),
+                                    password: _passwordController.text.trim(),
+                                    fullName: _fullNameController.text.trim(),
+                                    email: _emailController.text.trim(),
+                                    confrimPassword:
+                                        _reenterController.text.trim(),
+                                  )));
+                    }
                   }),
             ),
             GestureDetector(
@@ -319,5 +363,12 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  selectImage() async {
+    Uint8List ui = await pickImage(ImageSource.gallery);
+    setState(() {
+      image = ui;
+    });
   }
 }
