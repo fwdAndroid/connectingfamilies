@@ -16,6 +16,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _reenterController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  TextEditingController _fullNameController = TextEditingController();
   bool isChecked = false;
   bool passwordVisible = false;
   bool isLoading = false;
@@ -58,6 +59,48 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 195,
                 ),
               ),
+            ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 16),
+                  child: Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: Text(
+                      'Full Name',
+                      style: GoogleFonts.poppins(
+                          color: black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                  padding: const EdgeInsets.all(8),
+                  child: TextFormField(
+                    controller: _fullNameController,
+                    style: GoogleFonts.poppins(color: black),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: iconColor,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: borderColor)),
+                        errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: borderColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: borderColor)),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: borderColor)),
+                        hintText: "Enter Email Address",
+                        hintStyle:
+                            GoogleFonts.poppins(color: black, fontSize: 12)),
+                  ),
+                ),
+              ],
             ),
             Column(
               children: [
