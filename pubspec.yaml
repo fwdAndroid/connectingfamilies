@@ -36,6 +36,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.1
+  geocoding: ^3.0.0
+  geolocator: ^13.0.1
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.1
   group_button: ^5.3.4

@@ -1,7 +1,9 @@
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_two.dart';
+import 'package:connectingfamilies/service/location_service.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 import 'package:intl/intl.dart';
@@ -31,9 +33,19 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   TextEditingController locationController = TextEditingController();
   TextEditingController othersController =
       TextEditingController(); // Controller for Others text field
+  TextEditingController dateofBirthController = TextEditingController();
   String dropdownvalue = 'Woman';
   bool showSpecialSituations = false; // Boolean to control visibility
   bool showOthersField = false; // Boolean to control visibility of Others field
+
+  final LocationService _locationService =
+      LocationService(); // Instantiate the service
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocationAndAddress();
+  }
 
   // List of items in our dropdown menu
   var items = [
@@ -257,14 +269,14 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                       //you can implement different kind of Date Format here according to your requirement
 
                       setState(() {
-                        locationController.text =
+                        dateofBirthController.text =
                             formattedDate; //set output date to TextField value.
                       });
                     } else {
                       print("Date is not selected");
                     }
                   },
-                  controller: locationController,
+                  controller: dateofBirthController,
                   style: GoogleFonts.poppins(color: black),
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
@@ -469,5 +481,24 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
         icon: Icon(Icons.delete),
       ),
     );
+  }
+
+  Future<void> _fetchLocationAndAddress() async {
+    try {
+      // Fetch current location
+      Position position = await _locationService.getCurrentLocation();
+
+      // Convert location to address
+      String address =
+          await _locationService.getAddressFromCoordinates(position);
+
+      // Set the address in the TextFormField
+      setState(() {
+        locationController.text = address;
+      });
+    } catch (e) {
+      // Handle exceptions (e.g., display an error message)
+      print('Error: $e');
+    }
   }
 }
