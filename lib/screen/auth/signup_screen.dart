@@ -53,17 +53,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, left: 16),
-              child: Align(
-                alignment: AlignmentDirectional.topStart,
-                child: Image.asset(
-                  "assets/photo.png",
-                  width: 226,
-                  height: 195,
-                ),
-              ),
-            ),
             GestureDetector(
               onTap: () => selectImage(),
               child: image != null
@@ -102,7 +91,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                         prefixIcon: Icon(
-                          Icons.email_outlined,
+                          Icons.person,
                           color: iconColor,
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -113,7 +102,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Email Address",
+                        hintText: "Enter Full Name",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
