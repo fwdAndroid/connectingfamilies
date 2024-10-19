@@ -6,7 +6,30 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 
 class ProfileSetupTwo extends StatefulWidget {
-  const ProfileSetupTwo({super.key});
+  String familyDescription;
+  final String image;
+  final String phoneNumber;
+  final String confirmPassword;
+  final String password;
+  final String fullName;
+  final String email;
+  final String dob;
+  final String location;
+  final String specialSituation;
+  final String familyType;
+  ProfileSetupTwo(
+      {super.key,
+      required this.image,
+      required this.confirmPassword,
+      required this.fullName,
+      required this.dob,
+      required this.email,
+      required this.familyDescription,
+      required this.location,
+      required this.password,
+      required this.familyType,
+      required this.phoneNumber,
+      required this.specialSituation});
 
   @override
   State<ProfileSetupTwo> createState() => _ProfileSetupTwoState();
@@ -18,6 +41,9 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
       false; // Boolean to control visibility of Others field
   TextEditingController _nuController = TextEditingController();
   TextEditingController _controller = TextEditingController();
+
+  String selectedNutritionSituation = '';
+  String selectedParentingSituation = '';
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +82,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onSelected: (value, index, isSelected) {
-                      // Check if "Others" is selected
                       setState(() {
-                        showOthersField = (value == "Others");
+                        if (value == "Others") {
+                          showOthersField = true;
+                          selectedParentingSituation = '';
+                        } else {
+                          showOthersField = false;
+                          selectedParentingSituation = value.toString();
+                        }
                       });
                     },
                     isRadio: true,
@@ -88,55 +119,6 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                 )
               ],
             ),
-            if (showOthersField) buildOthersField(),
-            // Column(
-            //   children: [
-            //     Padding(
-            //       padding: const EdgeInsets.only(top: 10.0, left: 16),
-            //       child: Align(
-            //         alignment: AlignmentDirectional.topStart,
-            //         child: Text(
-            //           'Activities',
-            //           style: GoogleFonts.poppins(
-            //               color: black,
-            //               fontWeight: FontWeight.w500,
-            //               fontSize: 17),
-            //         ),
-            //       ),
-            //     ),
-            //     Container(
-            //       margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
-            //       child: GroupButton(
-            //         options: GroupButtonOptions(
-            //           buttonWidth: 100,
-            //           unselectedTextStyle:
-            //               GoogleFonts.poppins(color: black, fontSize: 10),
-            //           selectedTextStyle:
-            //               GoogleFonts.poppins(color: colorWhite, fontSize: 10),
-            //           textAlign: TextAlign.center,
-            //           selectedBorderColor: firstMainColor,
-            //           borderRadius: BorderRadius.circular(20),
-            //         ),
-            //         onSelected: (value, index, isSelected) {},
-            //         isRadio: false,
-            //         buttons: [
-            //           "Take a Walk",
-            //           "Camper",
-            //           "Deep Chats",
-            //           "Hiking",
-            //           "Family trips",
-            //           "Cine",
-            //           "Pinics",
-            //           "High Capacities",
-            //           "Vision problems",
-            //           "Audition problemsne",
-            //           "Asperger",
-            //           "Others",
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
             Column(
               children: [
                 Padding(
@@ -166,9 +148,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onSelected: (value, index, isSelected) {
-                      // Check if "Others" is selected
                       setState(() {
-                        showOthersFieldNu = (value == "Others");
+                        if (value == "Others") {
+                          showOthersFieldNu = true;
+                          selectedNutritionSituation = '';
+                        } else {
+                          showOthersFieldNu = false;
+                          selectedNutritionSituation = value.toString();
+                        }
                       });
                     },
                     isRadio: true,
@@ -204,10 +191,30 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
               child: SaveButton(
                   title: " Next",
                   onTap: () {
+                    String finalNuSituation = showOthersFieldNu
+                        ? _nuController.text
+                        : selectedNutritionSituation;
+                    String finalPSituation = showOthersField
+                        ? _controller.text
+                        : selectedParentingSituation;
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => ProfileSetupThree()));
+                            builder: (builder) => ProfileSetupThree(
+                                  email: widget.email,
+                                  parenting: finalPSituation,
+                                  nutrition: finalNuSituation,
+                                  location: widget.location,
+                                  password: widget.password,
+                                  phoneNumber: widget.phoneNumber,
+                                  specialSituation: widget.specialSituation,
+                                  image: widget.image,
+                                  familyDescription: widget.familyDescription,
+                                  confirmPassword: widget.confirmPassword,
+                                  fullName: widget.fullName,
+                                  dob: widget.dob,
+                                  familyType: widget.familyType,
+                                )));
                   }),
             )
           ],

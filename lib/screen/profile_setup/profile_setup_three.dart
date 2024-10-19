@@ -6,7 +6,34 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 
 class ProfileSetupThree extends StatefulWidget {
-  const ProfileSetupThree({super.key});
+  String familyDescription;
+  final String image;
+  final String phoneNumber;
+  final String confirmPassword;
+  final String password;
+  final String fullName;
+  final String email;
+  final String dob;
+  final String location;
+  final String specialSituation;
+  final String familyType;
+  final String nutrition;
+  final String parenting;
+  ProfileSetupThree(
+      {super.key,
+      required this.image,
+      required this.confirmPassword,
+      required this.fullName,
+      required this.nutrition,
+      required this.parenting,
+      required this.dob,
+      required this.email,
+      required this.familyDescription,
+      required this.location,
+      required this.password,
+      required this.familyType,
+      required this.phoneNumber,
+      required this.specialSituation});
 
   @override
   State<ProfileSetupThree> createState() => _ProfileSetupThreeState();
@@ -15,7 +42,32 @@ class ProfileSetupThree extends StatefulWidget {
 class _ProfileSetupThreeState extends State<ProfileSetupThree> {
   TextEditingController othersController = TextEditingController();
   bool showOthersField = false; // Boolean to control visibility of Others field
-
+  List<String> selectedActivities = [];
+  final List<String> activities = [
+    "Camping",
+    "Hikking",
+    "Traveling",
+    "Take a Walk",
+    "Board Games",
+    "Out Door Activities",
+    "Ball Park",
+    "Cycling",
+    "Pet Walks",
+    "Soccer",
+    "Cultural Activities",
+    "Basket",
+    "Skating",
+    "Beach",
+    "Reading (Books)",
+    "Sports",
+    "Laser Games",
+    "Scape Rooms",
+    "Peaceful Activities",
+    "City Family",
+    "Going to the Park",
+    "Country Side Family",
+    "Others",
+  ];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -67,37 +119,17 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onSelected: (value, index, isSelected) {
-                      // Check if "Others" is selected
                       setState(() {
+                        if (isSelected) {
+                          selectedActivities.add(value);
+                        } else {
+                          selectedActivities.remove(value);
+                        }
                         showOthersField = (value == "Others");
                       });
                     },
-                    isRadio: true,
-                    buttons: [
-                      "Camping",
-                      "Hikking",
-                      "Traveling",
-                      "Take a Walk",
-                      "Board Games",
-                      "Out Door Activities",
-                      "Ball Park",
-                      "Cycling",
-                      "Pet Walks",
-                      "Soccer",
-                      "Cultural Activities",
-                      "Basket",
-                      "Skating",
-                      "Beach",
-                      "Reading (Books)",
-                      "Sports",
-                      "Laser Games",
-                      "Scape Rooms",
-                      "Peaceful Activities",
-                      "City Family",
-                      "Going to the Park",
-                      "Country Side Family",
-                      "Others",
-                    ],
+                    isRadio: false, // Set to false to allow multiple selections
+                    buttons: activities,
                   ),
                 ),
                 Padding(

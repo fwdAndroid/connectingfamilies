@@ -9,20 +9,22 @@ import 'package:group_button/group_button.dart';
 import 'package:intl/intl.dart';
 
 class ProfileSetupOne extends StatefulWidget {
-  final image;
-  final phoneNumber;
-  final confrimPassword;
-  final password;
-  final fullName;
-  final email;
-  const ProfileSetupOne(
-      {super.key,
-      required this.confrimPassword,
-      required this.email,
-      required this.fullName,
-      required this.image,
-      required this.password,
-      required this.phoneNumber});
+  var image;
+  final String phoneNumber;
+  final String confirmPassword;
+  final String password;
+  final String fullName;
+  final String email;
+
+  ProfileSetupOne({
+    Key? key,
+    required this.confirmPassword,
+    required this.email,
+    required this.fullName,
+    required this.image,
+    required this.password,
+    required this.phoneNumber,
+  }) : super(key: key);
 
   @override
   State<ProfileSetupOne> createState() => _ProfileSetupOneState();
@@ -31,29 +33,22 @@ class ProfileSetupOne extends StatefulWidget {
 class _ProfileSetupOneState extends State<ProfileSetupOne> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController locationController = TextEditingController();
-  TextEditingController othersController =
-      TextEditingController(); // Controller for Others text field
-  TextEditingController dateofBirthController = TextEditingController();
-  String dropdownvalue = 'Woman';
-  bool showSpecialSituations = false; // Boolean to control visibility
-  bool showOthersField = false; // Boolean to control visibility of Others field
+  TextEditingController othersController = TextEditingController();
+  TextEditingController dateOfBirthController = TextEditingController();
+  String dropdownValue = 'Woman';
+  bool showSpecialSituations = false;
+  bool showOthersField = false;
+  String selectedSpecialSituation = '';
 
-  final LocationService _locationService =
-      LocationService(); // Instantiate the service
+  final LocationService _locationService = LocationService();
+
+  final List<String> items = ['Woman', 'Man', 'Boy', 'Girl'];
 
   @override
   void initState() {
     super.initState();
     _fetchLocationAndAddress();
   }
-
-  // List of items in our dropdown menu
-  var items = [
-    'Woman',
-    'Man',
-    'Boy',
-    'Girl',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,34 +58,36 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Family Description
               buildDescriptionSection(),
-
-              // Location
               buildLocationSection(),
-
-              // Family Type Dropdown
               buildFamilyTypeSection(),
-
-              // Special Situations Section
               if (showSpecialSituations) buildSpecialSituationsSection(),
-
-              // Others Text Field (conditional)
               if (showOthersField) buildOthersField(),
-
-              // Table
               buildMembersTable(),
-
-              // Save Button
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SaveButton(
-                  title: " Next",
+                  title: "Next",
                   onTap: () {
+                    String finalSpecialSituation = showOthersField
+                        ? othersController.text
+                        : selectedSpecialSituation;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (builder) => ProfileSetupTwo(),
+                        builder: (builder) => ProfileSetupTwo(
+                          email: widget.email,
+                          location: locationController.text.trim(),
+                          password: widget.password,
+                          phoneNumber: widget.phoneNumber,
+                          specialSituation: finalSpecialSituation,
+                          image: widget.image,
+                          familyDescription: descriptionController.text.trim(),
+                          confirmPassword: widget.confirmPassword,
+                          fullName: widget.fullName,
+                          dob: dateOfBirthController.text.trim(),
+                          familyType: dropdownValue,
+                        ),
                       ),
                     );
                   },
@@ -104,200 +101,64 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   }
 
   Widget buildDescriptionSection() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 16),
-          child: Align(
-            alignment: AlignmentDirectional.topStart,
-            child: Text(
-              'Family description*',
-              style: GoogleFonts.poppins(
-                color: black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
-              ),
-            ),
-          ),
-        ),
-        Container(
-          height: 155,
-          width: 322,
-          margin: const EdgeInsets.only(left: 10, right: 10),
-          padding: const EdgeInsets.all(8),
-          child: TextFormField(
-            maxLines: 10,
-            controller: descriptionController,
-            style: GoogleFonts.poppins(color: black),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xffF7F8F9),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              hintText:
-                  "Enter a brief description of your family and what are you looking for",
-              hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-            ),
-          ),
-        ),
-      ],
+    return buildSectionWithTextField(
+      title: 'Family description*',
+      hint:
+          "Enter a brief description of your family and what you're looking for",
+      controller: descriptionController,
+      maxLines: 5,
     );
   }
 
   Widget buildLocationSection() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 16),
-          child: Align(
-            alignment: AlignmentDirectional.topStart,
-            child: Text(
-              'Location*',
-              style: GoogleFonts.poppins(
-                color: black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
-              ),
-            ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(left: 10, right: 10),
-          padding: const EdgeInsets.all(8),
-          child: TextFormField(
-            controller: locationController,
-            style: GoogleFonts.poppins(color: black),
-            decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              hintText: "Enter Your Address",
-              hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-            ),
-          ),
-        ),
-      ],
+    return buildSectionWithTextField(
+      title: 'Location*',
+      hint: 'Enter Your Address',
+      controller: locationController,
     );
   }
 
   Widget buildFamilyTypeSection() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 16),
-          child: Align(
-            alignment: AlignmentDirectional.topStart,
-            child: Text(
-              'Family Type*',
-              style: GoogleFonts.poppins(
-                color: black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
+        buildSectionTitle('Family Type*'),
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: dropdownValue,
+                icon: const Icon(Icons.keyboard_arrow_down),
+                items: items.map((String item) {
+                  return DropdownMenuItem<String>(
+                    value: item,
+                    child: Text(item),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                    showSpecialSituations =
+                        ['Man', 'Woman', 'Boy', 'Girl'].contains(newValue);
+                  });
+                },
               ),
             ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(left: 10, right: 10),
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  // Initial Value
-                  value: dropdownvalue,
-                  // Down Arrow Icon
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  // Array list of items
-                  items: items.map((String item) {
-                    return DropdownMenuItem(
-                      value: item,
-                      child: Text(item),
-                    );
-                  }).toList(),
-                  // After selecting the desired option
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownvalue = newValue!;
-                      // Show special situations based on selected value
-                      showSpecialSituations = (newValue == 'Man' ||
-                          newValue == 'Woman' ||
-                          newValue == 'Boy' ||
-                          newValue == 'Girl'); // Adjust logic as needed
-                    });
-                  },
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: dateOfBirthController,
+                readOnly: true,
+                onTap: _pickDate,
+                style: GoogleFonts.poppins(color: black),
+                decoration: InputDecoration(
+                  hintText: "Date of Birth",
+                  hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
+                  border: const OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(
-                            2000), //DateTime.now() - not to allow to choose before today.
-                        lastDate: DateTime(2101));
-
-                    if (pickedDate != null) {
-                      print(
-                          pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                      String formattedDate =
-                          DateFormat('yyyy-MM-dd').format(pickedDate);
-                      print(
-                          formattedDate); //formatted date output using intl package =>  2021-03-16
-                      //you can implement different kind of Date Format here according to your requirement
-
-                      setState(() {
-                        dateofBirthController.text =
-                            formattedDate; //set output date to TextField value.
-                      });
-                    } else {
-                      print("Date is not selected");
-                    }
-                  },
-                  controller: dateofBirthController,
-                  style: GoogleFonts.poppins(color: black),
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    hintText: "Date of Birth",
-                    hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -306,113 +167,50 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   Widget buildSpecialSituationsSection() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 16),
-          child: Align(
-            alignment: AlignmentDirectional.topStart,
-            child: Text(
-              'Special Situations*',
-              style: GoogleFonts.poppins(
-                color: black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
-              ),
-            ),
+        buildSectionTitle('Special Situations*'),
+        GroupButton(
+          options: GroupButtonOptions(
+            buttonWidth: 100,
+            unselectedTextStyle:
+                GoogleFonts.poppins(color: black, fontSize: 10),
+            selectedTextStyle:
+                GoogleFonts.poppins(color: Colors.white, fontSize: 10),
+            selectedBorderColor: firstMainColor,
+            borderRadius: BorderRadius.circular(20),
           ),
+          onSelected: (value, index, isSelected) {
+            setState(() {
+              if (value == "Others") {
+                showOthersField = true;
+                selectedSpecialSituation = '';
+              } else {
+                showOthersField = false;
+                selectedSpecialSituation = value.toString();
+              }
+            });
+          },
+          isRadio: true,
+          buttons: [
+            "Wheel chair",
+            "Rare Disease",
+            "Mobility Problems",
+            "Autism",
+            "TDAH",
+            "High Capacities",
+            "Vision Problems",
+            "Others",
+            "Asperger",
+          ],
         ),
-        Container(
-          margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
-          child: GroupButton(
-            options: GroupButtonOptions(
-              buttonWidth: 100,
-              unselectedTextStyle:
-                  GoogleFonts.poppins(color: black, fontSize: 10),
-              selectedTextStyle:
-                  GoogleFonts.poppins(color: colorWhite, fontSize: 10),
-              textAlign: TextAlign.center,
-              selectedBorderColor: firstMainColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            onSelected: (value, index, isSelected) {
-              // Check if "Others" is selected
-              setState(() {
-                showOthersField = (value == "Others");
-              });
-            },
-            isRadio: true,
-            buttons: [
-              "Wheel chair",
-              "Rare Disease",
-              "Mobility Problems",
-              "Autism",
-              "TDAH",
-              "High Capacities",
-              "Vision Problems",
-              "Others",
-              "Asperger",
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                width: 130,
-                child: SaveButton(title: "Add", onTap: () {}),
-              ),
-            ],
-          ),
-        )
       ],
     );
   }
 
   Widget buildOthersField() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 16),
-          child: Align(
-            alignment: AlignmentDirectional.topStart,
-            child: Text(
-              'Please specify*',
-              style: GoogleFonts.poppins(
-                color: black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
-              ),
-            ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
-          padding: const EdgeInsets.all(8),
-          child: TextFormField(
-            controller: othersController,
-            style: GoogleFonts.poppins(color: black),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xffF7F8F9),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor),
-              ),
-              hintText: "Specify the situation",
-              hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-            ),
-          ),
-        ),
-      ],
+    return buildSectionWithTextField(
+      title: 'Please specify*',
+      hint: 'Specify the situation',
+      controller: othersController,
     );
   }
 
@@ -422,83 +220,108 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
       child: Table(
         border: TableBorder.all(),
         children: [
-          TableRow(
-            children: [
-              headerCell('Members'),
-              headerCell('Age'),
-              headerCell('Special Situation'),
-              headerCell('Remove'),
-            ],
-          ),
-          TableRow(
-            children: [
-              editableCell('Man'),
-              editableCell('10'),
-              editableCell('No'),
-              removeCell(),
-            ],
-          ),
-          TableRow(
-            children: [
-              editableCell('Boy'),
-              editableCell('12'),
-              editableCell('Yes'),
-              removeCell(),
-            ],
-          ),
+          buildTableRow(['Members', 'Age', 'Special Situation', 'Remove'],
+              isHeader: true),
+          buildTableRow(['Man', '10', 'No', '']),
+          buildTableRow(['Boy', '12', 'Yes', '']),
         ],
-      ),
-    );
-  }
-
-  Widget headerCell(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget editableCell(String initialValue) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        initialValue: initialValue,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
-
-  Widget removeCell() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: IconButton(
-        onPressed: () {},
-        icon: Icon(Icons.delete),
       ),
     );
   }
 
   Future<void> _fetchLocationAndAddress() async {
     try {
-      // Fetch current location
       Position position = await _locationService.getCurrentLocation();
-
-      // Convert location to address
       String address =
           await _locationService.getAddressFromCoordinates(position);
-
-      // Set the address in the TextFormField
       setState(() {
         locationController.text = address;
       });
     } catch (e) {
-      // Handle exceptions (e.g., display an error message)
-      print('Error: $e');
+      print('Error fetching location: $e');
     }
+  }
+
+  Future<void> _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        dateOfBirthController.text =
+            DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
+  }
+
+  TableRow buildTableRow(List<String> cells, {bool isHeader = false}) {
+    return TableRow(
+      children: cells.map((cell) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: isHeader
+              ? Text(cell, style: const TextStyle(fontWeight: FontWeight.bold))
+              : cell.isNotEmpty
+                  ? TextFormField(
+                      initialValue: cell,
+                      decoration:
+                          const InputDecoration(border: InputBorder.none),
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {},
+                    ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget buildSectionWithTextField({
+    required String title,
+    required String hint,
+    required TextEditingController controller,
+    int maxLines = 1,
+  }) {
+    return Column(
+      children: [
+        buildSectionTitle(title),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.all(8),
+          child: TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            style: GoogleFonts.poppins(color: black),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xffF7F8F9),
+              hintText: hint,
+              hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
+              border: const OutlineInputBorder(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0, left: 16),
+      child: Align(
+        alignment: AlignmentDirectional.topStart,
+        child: Text(
+          title,
+          style: GoogleFonts.poppins(
+            color: black,
+            fontWeight: FontWeight.w500,
+            fontSize: 17,
+          ),
+        ),
+      ),
+    );
   }
 }
