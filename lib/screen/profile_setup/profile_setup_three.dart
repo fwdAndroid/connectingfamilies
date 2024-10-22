@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:connectingfamilies/screen/profile_setup/app_regulation.dart';
+import 'package:connectingfamilies/service/database.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
+import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +11,7 @@ import 'package:group_button/group_button.dart';
 
 class ProfileSetupThree extends StatefulWidget {
   String familyDescription;
-  final String image;
+  final Uint8List image;
   final String phoneNumber;
   final String confirmPassword;
   final String password;
@@ -43,6 +47,7 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
   TextEditingController othersController = TextEditingController();
   bool showOthersField = false; // Boolean to control visibility of Others field
   List<String> selectedActivities = [];
+  bool isLoading = false;
   final List<String> activities = [
     "Camping",
     "Hikking",
@@ -147,17 +152,57 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
               ],
             ),
             if (showOthersField) buildOthersField(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  title: " Next",
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => AppRegulation()));
-                  }),
-            )
+            isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SaveButton(
+                        title: " Registered",
+                        onTap: () {
+                          if (selectedActivities.length < 3) {
+                            // Check if at least 3 activities are selected
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Please select at least 3 activities')),
+                            );
+                            return;
+                          }
+                          if (showOthersField &&
+                              othersController.text.isNotEmpty) {
+                            selectedActivities.add(othersController.text);
+                          }
+                          setState(() {
+                            isLoading = true;
+                          });
+
+                          DatabaseMethods().signUpUser(
+                              confirmPassword: widget.confirmPassword,
+                              fullName: widget.fullName,
+                              nutrition: widget.nutrition,
+                              parenting: widget.parenting,
+                              dob: widget.dob,
+                              email: widget.email,
+                              familyDescription: widget.familyDescription,
+                              location: widget.location,
+                              password: widget.password,
+                              familyType: widget.familyType,
+                              interest: selectedActivities,
+                              phoneNumber: widget.phoneNumber,
+                              specialSituation: widget.specialSituation,
+                              file: widget.image);
+                          setState(() {
+                            isLoading = false;
+                          });
+                          showMessageBar("Registration Complete", context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => AppRegulation()));
+                        }),
+                  )
           ],
         )
       ]),

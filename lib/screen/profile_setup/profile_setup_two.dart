@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_three.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
@@ -7,7 +9,7 @@ import 'package:group_button/group_button.dart';
 
 class ProfileSetupTwo extends StatefulWidget {
   String familyDescription;
-  final String image;
+  final Uint8List image;
   final String phoneNumber;
   final String confirmPassword;
   final String password;

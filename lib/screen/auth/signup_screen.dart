@@ -302,7 +302,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (builder) => ProfileSetupOne(
-                                    image: image,
+                                    image: image!,
                                     phoneNumber: phoneController.text.trim(),
                                     password: _passwordController.text.trim(),
                                     fullName: _fullNameController.text.trim(),
