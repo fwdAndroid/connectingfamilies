@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/screen/auth/other/other_user_profile.dart';
 import 'package:connectingfamilies/screen/main/pages/profile.dart';
 import 'package:connectingfamilies/screen/search/filter_screen.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,16 +22,48 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => UserProfilePage()));
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset("assets/chatimage.png"),
-            ),
-          )
+          StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return Center(child: Text('No data available'));
+                }
+                var snap = snapshot.data;
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (builder) => UserProfilePage(
+                                  photo: snap['photo'],
+                                  email: snap['email'],
+                                  familyDescription: snap['familyDescription'],
+                                  fullName: snap['fullName'],
+                                  location: snap['location'],
+                                  dateofBirth: snap['dateofBirth'],
+                                  interest: snap['interest'],
+                                  nutritions: snap['nutritions'],
+                                  parentingStyle: snap['parentingStyle'],
+                                  familyType: snap['familyType'],
+                                  specialSituation: snap['specialSituation'],
+                                  phoneNumber: snap['phoneNumber'],
+                                  uuid: snap['uuid'],
+                                )));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(snap['photo']),
+                    ),
+                  ),
+                );
+              })
         ],
       ),
       body: Column(

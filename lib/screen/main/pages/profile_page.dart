@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/main/pages/favourite_page.dart';
 import 'package:connectingfamilies/screen/main/pages/webpage.dart';
@@ -9,6 +10,7 @@ import 'package:connectingfamilies/screen/profile/notifcation.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/logout_widget.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
@@ -28,20 +30,51 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SafeArea(
             child: Column(
           children: [
-            const SizedBox(
-              height: 40,
-            ),
-            CircleAvatar(
-              backgroundImage: AssetImage("assets/chatimage.png"),
-              radius: 40,
-            ),
+            StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return Center(child: Text('No data available'));
+                  }
+                  var snap = snapshot.data;
+
+                  return Column(
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child:
+                              snap['photo'] != null && snap['photo'].isNotEmpty
+                                  ? CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        snap['photo'],
+                                      ),
+                                      radius: 40,
+                                    )
+                                  : CircleAvatar(
+                                      radius: 40,
+                                      child: Icon(Icons.person, size: 60),
+                                    ),
+                        ),
+                      ),
+                      Text(
+                        snap['fullName'],
+                        style: GoogleFonts.poppins(
+                            color: black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  );
+                }),
             const SizedBox(
               height: 20,
-            ),
-            Text(
-              "Amilie Jackson",
-              style: GoogleFonts.poppins(
-                  color: black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
               height: 40,

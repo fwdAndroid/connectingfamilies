@@ -4,7 +4,42 @@ import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class UserProfilePage extends StatelessWidget {
+class UserProfilePage extends StatefulWidget {
+  final String photo;
+  final String fullName;
+  final String email;
+  final String dateofBirth;
+  final String location;
+  final String nutritions;
+  final String parentingStyle;
+  final String phoneNumber;
+  final String familyDescription;
+  final String uuid;
+  final String familyType;
+  final String specialSituation;
+  final List<dynamic> interest;
+
+  UserProfilePage(
+      {super.key,
+      required this.photo,
+      required this.email,
+      required this.specialSituation,
+      required this.familyType,
+      required this.fullName,
+      required this.location,
+      required this.dateofBirth,
+      required this.interest,
+      required this.familyDescription,
+      required this.nutritions,
+      required this.parentingStyle,
+      required this.phoneNumber,
+      required this.uuid});
+
+  @override
+  State<UserProfilePage> createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -29,8 +64,7 @@ class UserProfilePage extends StatelessWidget {
                   bottom: Radius.circular(30),
                 ),
                 image: DecorationImage(
-                  image: AssetImage(
-                      'assets/pic.png'), // Replace with your image path
+                  image: NetworkImage(widget.photo),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -42,7 +76,7 @@ class UserProfilePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Sarah, 21',
+                    widget.fullName,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -51,17 +85,9 @@ class UserProfilePage extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.01),
                   Row(
                     children: [
-                      Icon(Icons.hiking, color: Colors.pink),
-                      SizedBox(width: 8),
-                      Text('Hiking'),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  Row(
-                    children: [
                       Icon(Icons.location_on, color: Colors.pink),
                       SizedBox(width: 8),
-                      Text('Lahore'),
+                      Text(widget.location),
                     ],
                   ),
                   Column(
@@ -97,7 +123,7 @@ class UserProfilePage extends StatelessWidget {
                                   borderSide: BorderSide(color: borderColor)),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide(color: borderColor)),
-                              hintText: "It is My Family Description Text",
+                              hintText: widget.familyDescription,
                               hintStyle: GoogleFonts.poppins(
                                   color: black, fontSize: 12)),
                         ),
@@ -106,30 +132,30 @@ class UserProfilePage extends StatelessWidget {
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   _buildSectionTitle('Family Type'),
-                  _buildInfoContainer('Mother'),
+                  _buildInfoContainer(widget.familyType),
                   _buildSectionTitle('Date of Birth'),
-                  _buildInfoContainer('23 December 2023'),
+                  _buildInfoContainer(widget.dateofBirth),
                   _buildSectionTitle('Special Situation'),
-                  _buildTag('Rare Disease'),
+                  _buildTag(widget.specialSituation),
                   _buildSectionTitle('Parenting Style'),
-                  _buildTag('Respectful Parenting'),
-                  _buildSectionTitle('Activities'),
-                  _buildTag('Camper'),
+                  _buildTag(widget.parentingStyle),
                   _buildSectionTitle('Nutrition'),
-                  _buildTag('Ultra-Processed Foods Free'),
-                  _buildSectionTitle('Language I Know'),
-                  _buildInfoContainer('Catalan'),
+                  _buildTag(widget.nutritions),
                   SizedBox(height: screenHeight * 0.02),
-                  // Hobbies Chips
+
+                  // Dynamic Hobbies Chips from Firebase
+                  _buildSectionTitle('Interests'),
                   Wrap(
                     spacing: 8.0,
                     runSpacing: 8.0,
-                    children: [
-                      _buildChip('Hiking'),
-                      _buildChip('Traveling'),
-                    ],
+                    children:
+                        List<Widget>.generate(widget.interest.length, (index) {
+                      return _buildChip(widget.interest[index]);
+                    }),
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
                   // Edit Profile Button
                   Center(
                     child: SaveButton(
