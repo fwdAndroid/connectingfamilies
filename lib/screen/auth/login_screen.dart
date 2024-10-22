@@ -1,7 +1,9 @@
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/auth/signup_screen.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
+import 'package:connectingfamilies/service/database.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
+import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,15 +20,16 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool isChecked = false;
-  bool passwordVisible = false;
+  bool showPassword = false;
+  //Password Functions
+  void toggleShowPassword() {
+    setState(() {
+      showPassword = !showPassword; // Toggle the showPassword flag
+    });
+  }
+
   bool isLoading = false;
   bool isGoogle = false;
-
-  @override
-  void initState() {
-    super.initState();
-    passwordVisible = true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   margin: const EdgeInsets.only(left: 10, right: 10),
                   padding: const EdgeInsets.all(8),
                   child: TextFormField(
-                    obscureText: passwordVisible,
+                    obscureText: !showPassword,
                     controller: _passwordController,
                     style: GoogleFonts.plusJakartaSans(color: black),
                     decoration: InputDecoration(
@@ -125,16 +128,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: iconColor,
                         ),
                         suffixIcon: IconButton(
-                          icon: Icon(passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off),
-                          onPressed: () {
-                            setState(
-                              () {
-                                passwordVisible = !passwordVisible;
-                              },
-                            );
-                          },
+                          onPressed: toggleShowPassword,
+                          icon: showPassword
+                              ? Icon(
+                                  Icons.visibility_off,
+                                  color: iconColor,
+                                )
+                              : Icon(
+                                  Icons.visibility,
+                                  color: iconColor,
+                                ),
                         ),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
@@ -187,17 +190,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  title: "Login",
-                  onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => MainDashboard()));
-                  }),
-            ),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SaveButton(
+                        title: "Login",
+                        onTap: () async {
+                          if (_emailController.text.isEmpty ||
+                              _passwordController.text.isEmpty) {
+                            showMessageBar(
+                                "Email & Password is Required", context);
+                          } else {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            String result = await DatabaseMethods().loginUpUser(
+                              email: _emailController.text.trim(),
+                              pass: _passwordController.text.trim(),
+                            );
+                            if (result == 'success') {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (builder) => MainDashboard()),
+                              );
+                            } else {
+                              showMessageBar(result, context);
+                            }
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        }),
+                  ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SocialLoginButton(
