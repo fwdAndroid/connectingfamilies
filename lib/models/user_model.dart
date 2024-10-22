@@ -9,9 +9,9 @@ class UserModel {
   String phoneNumber;
   String location;
   String familyDescription;
+  String familyType;
   String dateofBirth;
-  String? specialSitutionOthers;
-  String? specialSituationDropDown;
+  String specialSituation;
   String parentingStyle;
   final favorite;
   String nutritions;
@@ -28,8 +28,8 @@ class UserModel {
     required this.interest,
     required this.favorite,
     required this.location,
-    this.specialSituationDropDown,
-    this.specialSitutionOthers,
+    required this.familyType,
+    required this.specialSituation,
     required this.dateofBirth,
     required this.familyDescription,
     required this.parentingStyle,
@@ -48,9 +48,9 @@ class UserModel {
         'location': location,
         'familyDescription': familyDescription,
         'dateofBirth': dateofBirth,
-        'specialSitutionOthers': specialSitutionOthers,
+        'familyType': familyType,
         'parentingStyle': parentingStyle,
-        'specialSituationDropDown': specialSituationDropDown,
+        'specialSituation': specialSituation,
         'favorite': favorite,
         'nutritions': nutritions,
         'interest': interest,
@@ -71,9 +71,9 @@ class UserModel {
       location: snapshot['location'],
       familyDescription: snapshot['familyDescription'],
       dateofBirth: snapshot['dateofBirth'],
-      specialSitutionOthers: snapshot['specialSitutionOthers'],
+      specialSituation: snapshot['specialSituation'],
       parentingStyle: snapshot['parentingStyle'],
-      specialSituationDropDown: snapshot['specialSituationDropDown'],
+      familyType: snapshot['familyType'],
       favorite: snapshot['favorite'],
       nutritions: snapshot['nutritions'],
       interest: snapshot['interest'],

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/models/user_model.dart';
 import 'package:connectingfamilies/service/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uuid/uuid.dart';
 
 class DatabaseMethods {
   // Add Service
@@ -34,6 +33,7 @@ class DatabaseMethods {
         );
         //Add User to the database with modal
         UserModel userModel = UserModel(
+          familyType: familyType,
           photo: photoURL,
           uuid: cred.user!.uid,
           parentingStyle: parenting,
@@ -46,7 +46,7 @@ class DatabaseMethods {
           familyDescription: familyDescription,
           nutritions: nutrition,
           fullName: fullName,
-
+          specialSituation: specialSituation,
           email: email,
 
           password: password,
