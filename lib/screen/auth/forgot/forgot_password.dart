@@ -46,11 +46,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 Text(
                   "Create Password",
                   style: GoogleFonts.poppins(
-                      fontSize: 24, fontWeight: FontWeight.w600, color: black),
-                ),
-                Text(
-                  "Create Password",
-                  style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: textColor),

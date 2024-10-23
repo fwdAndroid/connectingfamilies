@@ -34,7 +34,7 @@ class _ReportAccountState extends State<ReportAccount> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Report account with inappropiate behaviour',
+              'Report account with inappropriate behavior',
               style: TextStyle(
                 fontSize: size.width * 0.045, // Responsive text size
                 fontWeight: FontWeight.bold,

@@ -19,7 +19,7 @@ class _FavouritePageState extends State<FavouritePage> {
         backgroundColor: colorWhite,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text("Favorite "),
+        title: const Text("Favorite"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

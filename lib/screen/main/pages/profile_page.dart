@@ -74,9 +74,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 }),
             const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
               height: 40,
             ),
             ListTile(
