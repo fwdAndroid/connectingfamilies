@@ -35,9 +35,9 @@ class _MessagePageState extends State<MessagePage> {
                 .where("userId",
                     isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                 .snapshots(),
-            builder: (context, AsyncSnapshot snapshot) {
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
               if (!snapshot.hasData || snapshot.data == null) {
                 return Center(
@@ -45,11 +45,14 @@ class _MessagePageState extends State<MessagePage> {
                             .localizedStrings['No data available'] ??
                         'No data available'));
               }
-              var snap = snapshot.data;
+
+              var docs = snapshot.data!.docs;
 
               return ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
+                itemCount: docs.length,
                 itemBuilder: (BuildContext context, int index) {
+                  var snap = docs[index].data() as Map<String, dynamic>;
+
                   return Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Card(
