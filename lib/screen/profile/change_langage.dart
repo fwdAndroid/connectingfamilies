@@ -1,6 +1,8 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ChangeLangage extends StatefulWidget {
   const ChangeLangage({super.key});
@@ -12,6 +14,9 @@ class ChangeLangage extends StatefulWidget {
 class _ChangeLangageState extends State<ChangeLangage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context); // Access the provider
+
     return Scaffold(
       backgroundColor: colorWhite,
       appBar: AppBar(
@@ -33,139 +38,166 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 ),
               ),
             ),
+            // ListTile for Spanish
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('es'); // Change to Spanish
+                Navigator.pop(context); // Optionally close the language screen
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'es'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Spanish",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for English
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('en'); // Change to English
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'en'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "English",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for French
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('fr'); // Change to French
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'fr'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "French",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Portuguese
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('pt'); // Change to Portuguese
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'pt'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Portuguese",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Catalan
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('ca'); // Change to Catalan
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'ca'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Catalan",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Valencian
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('val'); // Change to Valencian
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'val'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Valencian",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Galician
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('gl'); // Change to Galician
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'gl'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Galician",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Basque
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('eu'); // Change to Basque
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'eu'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Basque",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
+            // ListTile for Bable
             ListTile(
-              onTap: () {},
+              onTap: () {
+                languageProvider.changeLanguage('ast'); // Change to Bable
+                Navigator.pop(context);
+              },
               trailing: Icon(
-                Icons.radio_button_checked,
+                languageProvider.currentLanguage == 'ast'
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: textColor,
                 size: 20,
               ),
               title: Text(
                 "Bable",
-                style: GoogleFonts.poppins(
-                  color: black,
-                  fontSize: 16,
-                ),
+                style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
             Padding(
