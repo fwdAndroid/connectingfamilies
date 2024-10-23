@@ -144,11 +144,11 @@ class _EditProfileState extends State<EditProfile> {
     try {
       await _firestore.collection('users').doc(userId).update({
         'fullName': _nameController.text,
-        'description': _descriptionController.text,
+        'familyDescription': _descriptionController.text,
         'phoneNumber': _phoneController.text,
         'location': _locationController.text,
         'interest': selectedInterests,
-        'nutrition': dropDownNutrition == 'Others'
+        'nutritions': dropDownNutrition == 'Others'
             ? _otherNutritionController.text
             : dropDownNutrition,
         'parentingStyle': dropDownParenting == 'Others'
