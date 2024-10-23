@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
+import 'package:connectingfamilies/widget/delete_widget.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -396,7 +397,17 @@ class _EditProfileState extends State<EditProfile> {
                       onTap: updateUserProfile,
                     ),
                   ),
-                  TextButton(onPressed: () {}, child: Text("Delete Account"))
+                  TextButton(
+                      onPressed: () {
+                        showDialog<void>(
+                          context: context,
+                          barrierDismissible: false, // user must tap button!
+                          builder: (BuildContext context) {
+                            return DeleteWidget();
+                          },
+                        );
+                      },
+                      child: Text("Delete Account"))
                 ],
               ),
             ),

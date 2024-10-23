@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/screen/auth/login_screen.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/uitls/image_picker.dart';
@@ -5,8 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LogoutWidget extends StatelessWidget {
-  const LogoutWidget({super.key});
+class DeleteWidget extends StatelessWidget {
+  const DeleteWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class LogoutWidget extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Oh No, You are leaving",
+                      "Oh No, You are Deleting The Account",
                       style: GoogleFonts.workSans(
                         fontWeight: FontWeight.w500,
                         fontSize: 18,
@@ -51,7 +52,7 @@ class LogoutWidget extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Are you sure you want to logout?",
+                      "Are you sure you want to delete?",
                       style: GoogleFonts.workSans(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -85,18 +86,41 @@ class LogoutWidget extends StatelessWidget {
               onPressed: () async {
                 // Sign out from Firebase
 
-                await FirebaseAuth.instance.signOut();
+                try {
+                  // Get the current user
+                  User? user = FirebaseAuth.instance.currentUser;
 
-                // Sign out from Google
+                  // Check if user is signed in
+                  if (user != null) {
+                    // Step 1: Delete the user data from Firestore
+                    final userId = user.uid;
+                    await FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(userId)
+                        .delete();
 
-                // Navigate to login screen
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (builder) => LoginScreen()),
-                );
+                    // Step 2: Delete the user from Firebase Authentication
+                    await user.delete();
 
-                // Show snack bar message
-                showMessageBar("Logout Successfully", context);
+                    // Optionally, navigate to a sign-in page or show a success message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Account deleted successfully")),
+                    );
+
+                    // Navigate back to the sign-in page
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (builder) => LoginScreen()));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("No user is currently signed in")),
+                    );
+                  }
+                } catch (e) {
+                  // Handle errors (e.g., user not recently logged in, permissions, etc.)
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Error deleting account: $e")),
+                  );
+                }
 
                 // Show snack bar message
               },
