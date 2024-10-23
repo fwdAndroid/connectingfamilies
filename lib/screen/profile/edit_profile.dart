@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
-import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EditProfile extends StatefulWidget {
@@ -12,44 +17,28 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  TextEditingController _controller = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  bool isChecked = false;
-  bool isLoading = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  String dropdownvalueInterest = 'Camping';
-  String dropDownNutrition = "Without any Preference";
-  String dropDownParenting = "Avoid using electronic devices";
-  String dropDownSpecial = "Wheel Chair";
+  // Controllers for the profile fields
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _locationController = TextEditingController();
+  TextEditingController _otherInterestsController =
+      TextEditingController(); // Added for 'Others' in Interests
+  TextEditingController _otherNutritionController =
+      TextEditingController(); // Added for 'Others' in Nutrition
+  TextEditingController _otherParentingController =
+      TextEditingController(); // Added for 'Others' in Parenting Style
+  TextEditingController _otherSpecialController =
+      TextEditingController(); // Added for 'Others' in Special Situation
 
-  // List of items in our dropdown menu
-  var itemSpecial = [
-    "Wheel Chair",
-    "Rare Disease",
-    "Mobility Problems",
-    "Autism",
-    "TDAH",
-    "High Capacities",
-    "Vision Problems",
-    "Others",
-    "Asperger",
-  ];
-
-  var itemParenting = [
-    "Avoid using electronic devices",
-    "Free use of electronic devices",
-    "Moderate use of electronic devices",
-    "Respectful Parenting",
-    "A Slap in Time",
-    "Never Slap in Time",
-    "My children have Phone",
-    "Others",
-  ];
-
-  var itemsInterest = [
-    "Camping",
+  // Multi-Select for Interests
+  List<String> selectedInterests = [];
+  final List<String> availableInterests = [
+    'Camping',
     "Hikking",
     "Traveling",
     "Take a Walk",
@@ -71,19 +60,183 @@ class _EditProfileState extends State<EditProfile> {
     "City Family",
     "Going to the Park",
     "Country Side Family",
-    "Others",
+    "Others", // 'Others' option added here
   ];
 
-  var itemNutrition = [
-    "Without any Preference",
-    "Ultra-Processed Foods Free",
-    "Vegan",
-    "Vegetarian",
-    "Gluten Free",
-    "Sugar Free",
-    "Pig Free",
-    "Others",
-  ];
+  // Profile image
+  File? _profileImage;
+  String? profileImageUrl;
+
+  // Dropdown values
+  String dropDownNutrition = "No Preference";
+  String dropDownParenting = "Avoid using electronic devices";
+  String dropDownSpecial = "Wheel Chair";
+
+  bool isLoading = false;
+
+  // Fetch current user ID
+  String get userId => _auth.currentUser!.uid;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch existing profile details when the screen loads
+    fetchUserProfile();
+  }
+
+  // Fetch user profile data from Firestore
+  Future<void> fetchUserProfile() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        var data = userDoc.data() as Map<String, dynamic>;
+        _nameController.text = data['fullName'] ?? '';
+        _descriptionController.text = data['description'] ?? '';
+        _phoneController.text = data['phoneNumber'] ?? '';
+        _locationController.text = data['location'] ?? '';
+        selectedInterests = List<String>.from(data['interest'] ?? []);
+        dropDownNutrition = data['nutrition'] ?? 'No Preference';
+        dropDownParenting =
+            data['parentingStyle'] ?? 'Avoid using electronic devices';
+        dropDownSpecial = data['specialSituation'] ?? 'Wheel Chair';
+        profileImageUrl = data['photo'] ?? null;
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // Update user profile in Firestore
+  Future<void> updateUserProfile() async {
+    if (selectedInterests.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select at least 3 interests')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    // Upload profile image if selected
+    if (_profileImage != null) {
+      try {
+        String fileName = 'profile_images/$userId.jpg';
+        Reference storageRef = _storage.ref().child(fileName);
+        await storageRef.putFile(_profileImage!);
+        profileImageUrl = await storageRef.getDownloadURL();
+      } catch (e) {
+        print("Error uploading profile image: $e");
+      }
+    }
+
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'fullName': _nameController.text,
+        'description': _descriptionController.text,
+        'phoneNumber': _phoneController.text,
+        'location': _locationController.text,
+        'interest': selectedInterests,
+        'nutrition': dropDownNutrition == 'Others'
+            ? _otherNutritionController.text
+            : dropDownNutrition,
+        'parentingStyle': dropDownParenting == 'Others'
+            ? _otherParentingController.text
+            : dropDownParenting,
+        'specialSituation': dropDownSpecial == 'Others'
+            ? _otherSpecialController.text
+            : dropDownSpecial,
+        'photo': profileImageUrl,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated successfully')),
+      );
+      Navigator.push(
+          context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+    } catch (e) {
+      print("Error updating user profile: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile')),
+      );
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // Function to select a profile image
+  Future<void> _pickProfileImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: source);
+
+    if (pickedImage != null) {
+      setState(() {
+        _profileImage = File(pickedImage.path);
+      });
+    }
+  }
+
+  // Function to show the multi-select dialog
+  void _showInterestMultiSelect() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Select Interests (Max 3)'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: availableInterests.map((String interest) {
+                    return CheckboxListTile(
+                      title: Text(interest),
+                      value: selectedInterests.contains(interest),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            // Check if the selection limit (3) is reached
+                            if (selectedInterests.length < 3) {
+                              selectedInterests.add(interest);
+                            } else {
+                              selectedInterests[selectedInterests.length - 1] =
+                                  interest;
+                            }
+                          } else {
+                            selectedInterests.remove(interest);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,466 +245,185 @@ class _EditProfileState extends State<EditProfile> {
         title: Text(
           "Edit Profile",
           style: GoogleFonts.poppins(
-              fontSize: 18, fontWeight: FontWeight.w600, color: black),
+              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Image.asset(
-              "assets/p.png",
-              height: 100,
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Name',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    controller: _controller,
-                    style: GoogleFonts.poppins(color: black),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        hintText: "Fawad Kaleem",
-                        hintStyle:
-                            GoogleFonts.poppins(color: black, fontSize: 12)),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Phone Number',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    controller: phoneController,
-                    style: GoogleFonts.poppins(color: black),
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.phone,
-                          color: iconColor,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        hintText: "Phone Number",
-                        hintStyle:
-                            GoogleFonts.poppins(color: black, fontSize: 12)),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Family description',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 155,
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    maxLines: 10,
-                    controller: descriptionController,
-                    style: GoogleFonts.poppins(color: black),
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        hintText:
-                            "Enter a brief description of your family and what are you looking for",
-                        hintStyle:
-                            GoogleFonts.poppins(color: black, fontSize: 12)),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Location',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    controller: _passwordController,
-                    style: GoogleFonts.poppins(color: black),
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.location_pin,
-                          color: iconColor,
-                        ),
-                        suffixIcon: Icon(Icons.arrow_drop_down),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: borderColor)),
-                        hintText: "Germany",
-                        hintStyle:
-                            GoogleFonts.poppins(color: black, fontSize: 12)),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Special Situation',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: borderColor,
-                        ),
-                        right: BorderSide(
-                          color: borderColor,
-                        ),
-                        top: BorderSide(color: borderColor),
-                        bottom: BorderSide(
-                          color: borderColor,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Profile image section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () => _pickProfileImage(ImageSource.gallery),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : (profileImageUrl != null
+                                      ? NetworkImage(profileImageUrl!)
+                                      : AssetImage(
+                                          'assets/default_profile.png'))
+                                  as ImageProvider,
+                          child:
+                              _profileImage == null && profileImageUrl == null
+                                  ? Icon(Icons.camera_alt, size: 50)
+                                  : null,
                         ),
                       ),
                     ),
-                    margin: const EdgeInsets.only(left: 10, right: 10),
+                  ),
+                  // Name field
+                  buildTextField('Name', _nameController, 'Enter your name'),
+                  // Phone Number field
+                  buildTextField('Phone Number', _phoneController,
+                      'Enter your phone number'),
+                  // Family description field
+                  buildTextField('Family description', _descriptionController,
+                      'Enter a brief description',
+                      maxLines: 5),
+                  // Location field
+                  buildTextField(
+                      'Location', _locationController, 'Enter your location'),
+                  // Interest Multi-Select Button and display selected interests
+                  Padding(
                     padding: const EdgeInsets.all(8),
-                    child: DropdownButton(
-                      isExpanded: true,
-                      // Initial Value
-                      value: dropDownSpecial,
-                      isDense: false,
-                      underline: Container(color: Colors.transparent),
-
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-
-                      // Array list of items
-                      items: itemSpecial.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(
-                            items,
-                            style: GoogleFonts.poppins(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropDownSpecial = newValue!;
-                        });
-                      },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Interests (Min 3):',
+                            style: TextStyle(fontSize: 16)),
+                        Wrap(
+                          children: selectedInterests
+                              .map((interest) => Chip(
+                                    label: Text(interest),
+                                  ))
+                              .toList(),
+                        ),
+                        ElevatedButton(
+                          onPressed: _showInterestMultiSelect,
+                          child: Text('Select Interests'),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Interest',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: borderColor,
-                        ),
-                        right: BorderSide(
-                          color: borderColor,
-                        ),
-                        top: BorderSide(color: borderColor),
-                        bottom: BorderSide(
-                          color: borderColor,
-                        ),
-                      ),
-                    ),
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    padding: const EdgeInsets.all(8),
-                    child: DropdownButton(
-                      isExpanded: true,
-                      // Initial Value
-                      value: dropdownvalueInterest,
-                      isDense: false,
-                      underline: Container(color: Colors.transparent),
-
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-
-                      // Array list of items
-                      items: itemsInterest.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(
-                            items,
-                            style: GoogleFonts.poppins(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownvalueInterest = newValue!;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Nutrition',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: borderColor,
-                        ),
-                        right: BorderSide(
-                          color: borderColor,
-                        ),
-                        top: BorderSide(color: borderColor),
-                        bottom: BorderSide(
-                          color: borderColor,
-                        ),
-                      ),
-                    ),
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    padding: const EdgeInsets.all(8),
-                    child: DropdownButton(
-                      isExpanded: true,
-                      // Initial Value
-                      value: dropDownNutrition,
-                      isDense: false,
-                      underline: Container(color: Colors.transparent),
-
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-
-                      // Array list of items
-                      items: itemNutrition.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(
-                            items,
-                            style: GoogleFonts.poppins(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropDownNutrition = newValue!;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, left: 16),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Text(
-                      'Parenting Style',
-                      style: GoogleFonts.poppins(
-                          color: black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: borderColor,
-                        ),
-                        right: BorderSide(
-                          color: borderColor,
-                        ),
-                        top: BorderSide(color: borderColor),
-                        bottom: BorderSide(
-                          color: borderColor,
-                        ),
-                      ),
-                    ),
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    padding: const EdgeInsets.all(8),
-                    child: DropdownButton(
-                      isExpanded: true,
-                      // Initial Value
-                      value: dropDownParenting,
-                      isDense: false,
-                      underline: Container(color: Colors.transparent),
-
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-
-                      // Array list of items
-                      items: itemParenting.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(
-                            items,
-                            style: GoogleFonts.poppins(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropDownParenting = newValue!;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  title: "Save Changes",
-                  onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => MainDashboard()));
+                  // Nutrition dropdown in a Column
+                  buildDropdownColumn('Nutrition', dropDownNutrition, [
+                    "No Preference",
+                    "Ultra-Processed Foods Free",
+                    "Vegan",
+                    "Vegetarian",
+                    "Gluten Free",
+                    "Sugar Free",
+                    "Pork free",
+                    "Others",
+                  ], (String? newValue) {
+                    setState(() {
+                      dropDownNutrition = newValue!;
+                    });
                   }),
+                  if (dropDownNutrition == 'Others')
+                    buildTextField('Other Nutrition Preference',
+                        _otherNutritionController, 'Specify your nutrition'),
+                  // Parenting Style dropdown in a Column
+                  buildDropdownColumn('Parenting Style', dropDownParenting, [
+                    "Avoid using electronic devices",
+                    "Free use of electronic devices",
+                    "Moderate use of electronic devices",
+                    "Respectful Parenting",
+                    "A Slap in Time",
+                    "Never Slap in Time",
+                    "My children have Phone",
+                    "Others",
+                  ], (String? newValue) {
+                    setState(() {
+                      dropDownParenting = newValue!;
+                    });
+                  }),
+                  if (dropDownParenting == 'Others')
+                    buildTextField(
+                        'Other Parenting Style',
+                        _otherParentingController,
+                        'Specify your parenting style'),
+                  // Special Situation dropdown in a Column
+                  buildDropdownColumn('Special Situation', dropDownSpecial, [
+                    "Wheel chair",
+                    "Rare Disease",
+                    "Mobility Problems",
+                    "Autism",
+                    "TDAH",
+                    "High Capacities",
+                    "Vision Problems",
+                    "Others",
+                    "Asperger",
+                  ], (String? newValue) {
+                    setState(() {
+                      dropDownSpecial = newValue!;
+                    });
+                  }),
+                  if (dropDownSpecial == 'Others')
+                    buildTextField(
+                        'Other Special Situation',
+                        _otherSpecialController,
+                        'Specify your special situation'),
+                  SizedBox(height: 20),
+                  // Save Button
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SaveButton(
+                      title: "Update Profile",
+                      onTap: updateUserProfile,
+                    ),
+                  ),
+                  TextButton(onPressed: () {}, child: Text("Delete Account"))
+                ],
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextButton(
-                  onPressed: () {},
-                  child: Text("Delete Account",
-                      style: GoogleFonts.poppins(color: Colors.grey))),
-            ),
-          ],
+    );
+  }
+
+  // Helper function to create text fields
+  Padding buildTextField(
+      String label, TextEditingController controller, String hintText,
+      {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(),
         ),
+      ),
+    );
+  }
+
+  // Helper function to create dropdowns in a column
+  Padding buildDropdownColumn(
+      String label, String currentValue, List<String> items, onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$label:', style: TextStyle(fontSize: 16)),
+          DropdownButton<String>(
+            isExpanded: true,
+            value: currentValue,
+            items: items.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }
