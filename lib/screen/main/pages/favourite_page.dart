@@ -44,10 +44,10 @@ class _FavouritePageState extends State<FavouritePage> {
                     ),
                   ),
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => OtherUserProfile()));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (builder) => OtherUserProfile()));
                   },
                   leading: Image.asset("assets/logo.png"),
                   title: Text(

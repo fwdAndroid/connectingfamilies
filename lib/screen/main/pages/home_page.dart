@@ -133,7 +133,7 @@ class _HomePageState extends State<HomePage> {
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection("users")
-                    .where("uid",
+                    .where("uuid",
                         isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
@@ -170,7 +170,24 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (builder) => OtherUserProfile()));
+                                  builder: (builder) => OtherUserProfile(
+                                        interest: data['interest'],
+                                        email: data['email'],
+                                        familyType: data['familyType'],
+                                        favorite: data['favorite'],
+                                        location: data['location'],
+                                        dateofBirth: data['dateofBirth'],
+                                        specialSituation:
+                                            data['specialSituation'],
+                                        parentingStyle: data['parentingStyle'],
+                                        nutritions: data['nutritions'],
+                                        phoneNumber: data['phoneNumber'],
+                                        uuid: data['uuid'],
+                                        fullName: data['fullName'],
+                                        photo: data['photo'],
+                                        familyDescription:
+                                            data['familyDescription'],
+                                      )));
                         },
                         child: Container(
                           decoration: BoxDecoration(

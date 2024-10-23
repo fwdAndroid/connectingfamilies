@@ -1,13 +1,54 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/chat/chat_message.dart';
 import 'package:connectingfamilies/screen/profile/report_account.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
-class OtherUserProfile extends StatelessWidget {
+class OtherUserProfile extends StatefulWidget {
+  final String photo;
+  final String fullName;
+  final String email;
+  final String dateofBirth;
+  final String location;
+  final String nutritions;
+  final String parentingStyle;
+  final String phoneNumber;
+  final String familyDescription;
+  final String uuid;
+  final String familyType;
+  final String specialSituation;
+  final favorite;
+  final List<dynamic> interest;
+
+  OtherUserProfile(
+      {super.key,
+      required this.photo,
+      required this.favorite,
+      required this.email,
+      required this.specialSituation,
+      required this.familyType,
+      required this.fullName,
+      required this.location,
+      required this.dateofBirth,
+      required this.interest,
+      required this.familyDescription,
+      required this.nutritions,
+      required this.parentingStyle,
+      required this.phoneNumber,
+      required this.uuid});
+
+  @override
+  State<OtherUserProfile> createState() => _OtherUserProfileState();
+}
+
+class _OtherUserProfileState extends State<OtherUserProfile> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return SafeArea(
       child: Scaffold(
@@ -20,8 +61,8 @@ class OtherUserProfile extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(
-                      'assets/pic.png'), // Replace with your image path
+                  image: NetworkImage(
+                      widget.photo), // Replace with your image path
                   fit: BoxFit.cover,
                 ),
               ),
@@ -52,7 +93,7 @@ class OtherUserProfile extends StatelessWidget {
                 children: [
                   // Username
                   Text(
-                    'Jessica_Parker023',
+                    widget.fullName,
                     style: GoogleFonts.poppins(
                       color: Colors.black,
                       fontSize: 22,
@@ -66,7 +107,7 @@ class OtherUserProfile extends StatelessWidget {
                     children: [
                       Icon(Icons.location_on, color: Colors.pink),
                       SizedBox(width: 8),
-                      Text('Chicago, IL United States'),
+                      Text(widget.location),
                     ],
                   ),
                   SizedBox(height: 16),
@@ -114,17 +155,41 @@ class OtherUserProfile extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: ListView(
                   children: [
-                    buildSectionTitle('Interests'),
-                    buildTagRow(['Travelling', 'Camping', 'Hiking']),
-                    SizedBox(height: 16),
-                    buildSectionTitle('Nutrition'),
-                    buildTagRow(['Vegetarian']),
-                    SizedBox(height: 16),
-                    buildSectionTitle('Special Situations'),
-                    buildTagRow(['Wheel Chair']),
-                    SizedBox(height: 16),
-                    buildSectionTitle('Family Type'),
-                    buildTagRow(['Son']),
+                    _buildSectionTitle(
+                        languageProvider.localizedStrings['Family Type'] ??
+                            'Family Type'),
+                    _buildInfoContainer(widget.familyType),
+                    _buildSectionTitle(
+                        languageProvider.localizedStrings['Date of Birth'] ??
+                            'Date of Birth'),
+                    _buildInfoContainer(widget.dateofBirth),
+                    _buildSectionTitle(languageProvider
+                            .localizedStrings['Special Situation'] ??
+                        'Special Situation'),
+                    _buildTag(widget.specialSituation),
+                    _buildSectionTitle(
+                        languageProvider.localizedStrings['Parenting Style'] ??
+                            'Parenting Style'),
+                    _buildTag(widget.parentingStyle),
+                    _buildSectionTitle(
+                        languageProvider.localizedStrings['Nutrition'] ??
+                            'Nutrition'),
+                    _buildTag(widget.nutritions),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    // Dynamic Hobbies Chips from Firebase
+                    _buildSectionTitle(
+                        languageProvider.localizedStrings['Interests'] ??
+                            'Interests'),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: List<Widget>.generate(widget.interest.length,
+                          (index) {
+                        return _buildChip(widget.interest[index]);
+                      }),
+                    ),
+
                     SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -166,6 +231,61 @@ class OtherUserProfile extends StatelessWidget {
           backgroundColor: Colors.grey[200],
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoContainer(String info) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Text(
+        info,
+        style: TextStyle(color: Colors.black),
+      ),
+    );
+  }
+
+  Widget _buildTag(String text) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [Colors.pink, Colors.purple],
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildChip(String label) {
+    return Chip(
+      label: Text(
+        label,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.purple,
     );
   }
 }
