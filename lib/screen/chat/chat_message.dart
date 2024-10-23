@@ -1,24 +1,50 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatMessages extends StatefulWidget {
-  const ChatMessages({super.key});
+  final userId;
+  final userName;
+  final userPhoto;
+  final friendName;
+  final friendId;
+  final friendPhoto;
+  final chatUUid;
+  const ChatMessages(
+      {super.key,
+      required this.friendId,
+      required this.friendName,
+      required this.friendPhoto,
+      required this.userId,
+      required this.chatUUid,
+      required this.userName,
+      required this.userPhoto});
 
   @override
   State<ChatMessages> createState() => _ChatMessagesState();
 }
 
 class _ChatMessagesState extends State<ChatMessages> {
-  List<ChatMessage> messages = [
-    ChatMessage(messageContent: "Hello, Will", messageType: "receiver"),
-    ChatMessage(messageContent: "How have you been?", messageType: "receiver"),
-    ChatMessage(
-        messageContent: "Hey Kriss, I am doing fine dude. wbu?",
-        messageType: "sender"),
-    ChatMessage(messageContent: "ehhhh, doing OK.", messageType: "receiver"),
-    ChatMessage(
-        messageContent: "Is there any thing wrong?", messageType: "sender"),
-  ];
+  String groupChatId = "";
+  ScrollController scrollController = ScrollController();
+  TextEditingController messageController = TextEditingController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    if (FirebaseAuth.instance.currentUser!.uid.hashCode <=
+        widget.friendId.hashCode) {
+      groupChatId =
+          "${FirebaseAuth.instance.currentUser!.uid}-${widget.friendId}";
+    } else {
+      groupChatId =
+          "${widget.friendId}-${FirebaseAuth.instance.currentUser!.uid}";
+    }
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +70,7 @@ class _ChatMessagesState extends State<ChatMessages> {
                   width: 2,
                 ),
                 CircleAvatar(
-                  backgroundImage: AssetImage("assets/pic.png"),
+                  backgroundImage: NetworkImage(widget.friendPhoto),
                   maxRadius: 20,
                 ),
                 SizedBox(
@@ -56,7 +82,7 @@ class _ChatMessagesState extends State<ChatMessages> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        "Kriss Benwat",
+                        widget.friendName,
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
@@ -76,88 +102,148 @@ class _ChatMessagesState extends State<ChatMessages> {
           ),
         ),
       ),
-      body: Stack(
+      body: Column(
         children: <Widget>[
-          ListView.builder(
-            itemCount: messages.length,
-            shrinkWrap: true,
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
-                child: Align(
-                  alignment: (messages[index].messageType == "receiver"
-                      ? Alignment.topLeft
-                      : Alignment.topRight),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: (messages[index].messageType == "receiver"
-                          ? Colors.grey.shade200
-                          : firstMainColor),
-                    ),
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                      messages[index].messageContent,
-                      style: messages[index].messageType == "receiver"
-                          ? TextStyle(fontSize: 15, color: black)
-                          : TextStyle(fontSize: 15, color: colorWhite),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("messages")
+                  .doc(groupChatId)
+                  .collection(groupChatId)
+                  .orderBy("timestamp", descending: false)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!.docs == 0
+                      ? Center(child: Text("Vacía "))
+                      : Expanded(
+                          child: ListView.builder(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 14),
+                            reverse: false,
+                            controller: scrollController,
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var ds = snapshot.data!.docs[index];
+                              return ds.get("type") == 0
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      child: Align(
+                                        alignment: (ds.get("senderId") ==
+                                                FirebaseAuth
+                                                    .instance.currentUser!.uid
+                                            ? Alignment.topLeft
+                                            : Alignment.topRight),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              (ds.get("senderId") ==
+                                                      FirebaseAuth.instance
+                                                          .currentUser!.uid
+                                                  ? CrossAxisAlignment.start
+                                                  : CrossAxisAlignment.end),
+                                          //     crossAxisAlignment:
+                                          // messages[index].messageType ==
+                                          //         "receiver"
+                                          //     ? CrossAxisAlignment.start
+                                          //     : CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                color: (ds.get("senderId") ==
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid
+                                                    ? Color(0xfff0f2f9)
+                                                    : Color(0xff668681)),
+                                              ),
+                                              padding: EdgeInsets.all(12),
+                                              child: Text(
+                                                ds.get("content"),
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: (ds.get(
+                                                                "senderId") ==
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid
+                                                        ? black
+                                                        : colorWhite)),
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              DateFormat.jm().format(DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                                      int.parse(
+                                                          ds.get("time")))),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : Container();
+                            },
+                          ),
+                        );
+                } else if (snapshot.hasError) {
+                  return Center(child: Icon(Icons.error_outline));
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }),
           Align(
             alignment: Alignment.bottomLeft,
             child: Container(
-              padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 14),
               height: 60,
-              width: double.infinity,
+              color: Colors.white,
               child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: Container(
-                      width: 269,
-                      height: 60,
-                      child: TextField(
-                          decoration: InputDecoration(
-                        contentPadding: EdgeInsets.only(top: 8, left: 8),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xffF1F1F1),
-                            ),
-                            borderRadius: BorderRadius.circular(30)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xffF1F1F1),
-                            ),
-                            borderRadius: BorderRadius.circular(30)),
-                        disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xffF1F1F1),
-                            ),
-                            borderRadius: BorderRadius.circular(30)),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xffF1F1F1),
-                            ),
-                            borderRadius: BorderRadius.circular(30)),
-                        border: InputBorder.none,
-                        filled: true,
-                        fillColor: Color(0xffF1F1F1),
-                        hintText: "Type Something...",
-                        hintStyle: TextStyle(color: Colors.black54),
-                      )),
-                    ),
+                    child: TextField(
+                        controller: messageController,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 8, left: 8),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffF1F1F1),
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffF1F1F1),
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          disabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffF1F1F1),
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffF1F1F1),
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Color(0xffF1F1F1),
+                          hintText: "Type Something...",
+                          hintStyle: TextStyle(color: Colors.black54),
+                        )),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  SizedBox(width: 10),
                   FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      sendMessage(messageController.text.trim(), 0);
+                    },
                     child: Icon(
                       Icons.keyboard_arrow_right,
                       color: textColor,
@@ -165,9 +251,6 @@ class _ChatMessagesState extends State<ChatMessages> {
                     ),
                     backgroundColor: chatbtb,
                     elevation: 0,
-                  ),
-                  const SizedBox(
-                    width: 10,
                   ),
                 ],
               ),
@@ -177,10 +260,59 @@ class _ChatMessagesState extends State<ChatMessages> {
       ),
     );
   }
-}
 
-class ChatMessage {
-  String messageContent;
-  String messageType;
-  ChatMessage({required this.messageContent, required this.messageType});
+  void sendMessage(String content, int type) {
+    // type: 0 = text, 1 = image, 2 = sticker
+    if (content.trim() != '') {
+      messageController.clear();
+
+      var documentReference = FirebaseFirestore.instance
+          .collection('messages')
+          .doc(groupChatId)
+          .collection(groupChatId)
+          .doc(DateTime.now().millisecondsSinceEpoch.toString());
+
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          documentReference,
+          {
+            "senderId": FirebaseAuth.instance.currentUser!.uid,
+            "receiverId": widget.friendId,
+            "time": DateTime.now().millisecondsSinceEpoch.toString(),
+            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+            'content': content,
+            'type': type
+          },
+        );
+      }).then((value) {
+        if (type == 0) {
+          // Assuming type 0 is for 'note'
+          updateLastMessageByProvider(content);
+        }
+      });
+
+      scrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    } else {
+      // Fluttertoast.showToast(msg: 'Nothing to send');
+    }
+  }
+
+  void updateLastMessageByProvider(String messageContent) async {
+    final chatDocRef =
+        FirebaseFirestore.instance.collection('chats').doc(widget.chatUUid);
+
+    // Check if the document exists before attempting to update it
+    final chatDocSnapshot = await chatDocRef.get();
+    if (chatDocSnapshot.exists) {
+      // Document exists, update the lastMessageByProvider field
+      await chatDocRef.update({
+        'lastMessageByCustomer': messageContent,
+      }).catchError((error) {
+        print("Failed to update last message by provider: $error");
+      });
+    } else {
+      print("Document does not exist, cannot update last message by provider");
+    }
+  }
 }
