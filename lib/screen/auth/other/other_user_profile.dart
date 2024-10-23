@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
-import 'package:connectingfamilies/screen/chat/chat_message.dart';
 import 'package:connectingfamilies/screen/profile/report_account.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,38 +21,62 @@ class OtherUserProfile extends StatefulWidget {
   final String uuid;
   final String familyType;
   final String specialSituation;
-  final favorite;
+  final List<dynamic> favorite;
   final List<dynamic> interest;
 
-  OtherUserProfile(
-      {super.key,
-      required this.photo,
-      required this.favorite,
-      required this.email,
-      required this.specialSituation,
-      required this.familyType,
-      required this.fullName,
-      required this.location,
-      required this.dateofBirth,
-      required this.interest,
-      required this.familyDescription,
-      required this.nutritions,
-      required this.parentingStyle,
-      required this.phoneNumber,
-      required this.uuid});
+  OtherUserProfile({
+    super.key,
+    required this.photo,
+    required this.favorite,
+    required this.email,
+    required this.specialSituation,
+    required this.familyType,
+    required this.fullName,
+    required this.location,
+    required this.dateofBirth,
+    required this.interest,
+    required this.familyDescription,
+    required this.nutritions,
+    required this.parentingStyle,
+    required this.phoneNumber,
+    required this.uuid,
+  });
 
   @override
   State<OtherUserProfile> createState() => _OtherUserProfileState();
 }
 
 class _OtherUserProfileState extends State<OtherUserProfile> {
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch current user's favorite list and check if this user is favorited
+    _checkIfFavorite();
+  }
+
+  Future<void> _checkIfFavorite() async {
+    final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    final currentUserDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserUid)
+        .get();
+
+    final currentUserFavorites = currentUserDoc.data()?['favorite'] ?? [];
+    setState(() {
+      isFavorite = currentUserFavorites.contains(widget.uuid);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    final languageProvider = Provider.of<LanguageProvider>(context);
     final screenHeight = MediaQuery.of(context).size.height;
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     var uuid = Uuid().v4();
+
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -65,8 +88,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
               width: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(
-                      widget.photo), // Replace with your image path
+                  image: NetworkImage(widget.photo), // Profile picture
                   fit: BoxFit.cover,
                 ),
               ),
@@ -126,69 +148,53 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                         child: Icon(Icons.clear, color: Colors.black),
                       ),
                       SizedBox(width: 20),
-                      StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .snapshots(),
-                          builder: (context, AsyncSnapshot snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return Center(
-                                  child: Text(languageProvider.localizedStrings[
-                                          'No data available'] ??
-                                      'No data available'));
-                            }
-                            var snap = snapshot.data;
-                            return GestureDetector(
-                              onTap: () async {
-                                // Add navigation to chat
-                                await FirebaseFirestore.instance
-                                    .collection("chats")
-                                    .doc(uuid)
-                                    .set({
-                                  "chatId": uuid,
-                                  "userId":
-                                      FirebaseAuth.instance.currentUser!.uid,
-                                  "userName": snap['fullName'],
-                                  "userPhoto": snap['photo'],
-                                  "friendId": widget.uuid,
-                                  "friendName": widget.fullName,
-                                  "friendPhoto": widget.photo,
-                                }).then((onValue) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (builder) => ChatMessages(
-                                                chatUUid: uuid,
-                                                userId: FirebaseAuth
-                                                    .instance.currentUser!.uid,
-                                                userName: snap['fullName'],
-                                                userPhoto: snap['photo'],
-                                                friendId: widget.uuid,
-                                                friendName: widget.fullName,
-                                                friendPhoto: widget.photo,
-                                              )));
-                                });
-                              },
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 24,
-                                child: Icon(Icons.chat_bubble_outline,
-                                    color: Colors.black),
-                              ),
-                            );
-                          }),
-                      SizedBox(width: 20),
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 24,
-                        child: Icon(Icons.favorite, color: Colors.red),
+                      GestureDetector(
+                        onTap: () async {
+                          // Chat logic
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 24,
+                          child: Icon(Icons.chat_bubble_outline,
+                              color: Colors.black),
+                        ),
                       ),
                       SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: () async {
+                          final currentUser =
+                              FirebaseAuth.instance.currentUser!;
+                          final currentUserDoc = FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(currentUser.uid);
+
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+
+                          if (isFavorite) {
+                            // Add this user to the favorite list
+                            await currentUserDoc.update({
+                              "favorite": FieldValue.arrayUnion([widget.uuid])
+                            });
+                          } else {
+                            // Remove this user from the favorite list
+                            await currentUserDoc.update({
+                              "favorite": FieldValue.arrayRemove([widget.uuid])
+                            });
+                          }
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 24,
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                            color: isFavorite ? Colors.red : Colors.black,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -240,7 +246,9 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SaveButton(
-                          title: "Report Account",
+                          title: languageProvider
+                                  .localizedStrings['Report Account'] ??
+                              "Report Account",
                           onTap: () {
                             Navigator.push(
                                 context,
