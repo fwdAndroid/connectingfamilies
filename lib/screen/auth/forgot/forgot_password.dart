@@ -1,8 +1,10 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/forgot/confrim_password.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -27,6 +29,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -44,7 +48,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             Column(
               children: [
                 Text(
-                  "Create Password",
+                  languageProvider.localizedStrings['Create Password'] ??
+                      "Create Password",
                   style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -59,7 +64,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Password',
+                      languageProvider.localizedStrings['Password'] ??
+                          'Password',
                       style: GoogleFonts.plusJakartaSans(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -99,7 +105,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Password",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Password'] ??
+                            "Enter Password",
                         hintStyle: GoogleFonts.plusJakartaSans(
                             color: black, fontSize: 12)),
                   ),
@@ -113,7 +121,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Password',
+                      languageProvider.localizedStrings['Password'] ??
+                          'Password',
                       style: GoogleFonts.plusJakartaSans(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -153,7 +162,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Password",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Password'] ??
+                            "Enter Password",
                         hintStyle: GoogleFonts.plusJakartaSans(
                             color: black, fontSize: 12)),
                   ),
@@ -163,7 +174,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SaveButton(
-                  title: "Create Password",
+                  title: languageProvider.localizedStrings['Create Password'] ??
+                      "Create Password",
                   onTap: () async {
                     Navigator.push(
                         context,
