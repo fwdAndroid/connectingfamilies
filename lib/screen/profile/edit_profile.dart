@@ -97,11 +97,11 @@ class _EditProfileState extends State<EditProfile> {
       if (userDoc.exists) {
         var data = userDoc.data() as Map<String, dynamic>;
         _nameController.text = data['fullName'] ?? '';
-        _descriptionController.text = data['description'] ?? '';
+        _descriptionController.text = data['familyDescription'] ?? '';
         _phoneController.text = data['phoneNumber'] ?? '';
         _locationController.text = data['location'] ?? '';
         selectedInterests = List<String>.from(data['interest'] ?? []);
-        dropDownNutrition = data['nutrition'] ?? 'No Preference';
+        dropDownNutrition = data['nutritions'] ?? 'No Preference';
         dropDownParenting =
             data['parentingStyle'] ?? 'Avoid using electronic devices';
         dropDownSpecial = data['specialSituation'] ?? 'Wheel Chair';
