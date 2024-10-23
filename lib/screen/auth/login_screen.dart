@@ -242,19 +242,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         }),
                   ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SocialLoginButton(
-                height: 55,
-                width: 327,
-                buttonType: SocialLoginButtonType.facebook,
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (builder) => MainDashboard()));
-                },
-                borderRadius: 15,
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: SocialLoginButton(
+            //     height: 55,
+            //     width: 327,
+            //     buttonType: SocialLoginButtonType.facebook,
+            //     onPressed: () {
+            //       Navigator.push(context,
+            //           MaterialPageRoute(builder: (builder) => MainDashboard()));
+            //     },
+            //     borderRadius: 15,
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SocialLoginButton(

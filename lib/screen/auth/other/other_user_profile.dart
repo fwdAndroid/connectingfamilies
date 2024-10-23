@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
+import 'package:connectingfamilies/screen/chat/chat_message.dart';
 import 'package:connectingfamilies/screen/profile/report_account.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -142,23 +143,62 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 24,
-                        child: Icon(Icons.clear, color: Colors.black),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () async {
-                          // Chat logic
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 24,
-                          child: Icon(Icons.chat_bubble_outline,
-                              color: Colors.black),
-                        ),
-                      ),
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .snapshots(),
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (!snapshot.hasData || snapshot.data == null) {
+                              return Center(
+                                  child: Text(languageProvider.localizedStrings[
+                                          'No data available'] ??
+                                      'No data available'));
+                            }
+                            var snap = snapshot.data;
+                            return GestureDetector(
+                              onTap: () async {
+                                // Add navigation to chat
+                                await FirebaseFirestore.instance
+                                    .collection("chats")
+                                    .doc(uuid)
+                                    .set({
+                                  "chatId": uuid,
+                                  "userId":
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  "userName": snap['fullName'],
+                                  "userPhoto": snap['photo'],
+                                  "friendId": widget.uuid,
+                                  "friendName": widget.fullName,
+                                  "friendPhoto": widget.photo,
+                                }).then((onValue) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (builder) => ChatMessages(
+                                                chatUUid: uuid,
+                                                userId: FirebaseAuth
+                                                    .instance.currentUser!.uid,
+                                                userName: snap['fullName'],
+                                                userPhoto: snap['photo'],
+                                                friendId: widget.uuid,
+                                                friendName: widget.fullName,
+                                                friendPhoto: widget.photo,
+                                              )));
+                                });
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 24,
+                                child: Icon(Icons.chat_bubble_outline,
+                                    color: Colors.black),
+                              ),
+                            );
+                          }),
                       SizedBox(width: 20),
                       GestureDetector(
                         onTap: () async {
