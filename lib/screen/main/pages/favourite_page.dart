@@ -1,7 +1,9 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/other/other_user_profile.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class FavouritePage extends StatefulWidget {
   const FavouritePage({super.key});
@@ -13,13 +15,16 @@ class FavouritePage extends StatefulWidget {
 class _FavouritePageState extends State<FavouritePage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: colorWhite,
       appBar: AppBar(
         backgroundColor: colorWhite,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text("Favorite"),
+        title:
+            Text(languageProvider.localizedStrings['Favorite'] ?? "Favorite"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

@@ -22,7 +22,8 @@ class _ChangeLangageState extends State<ChangeLangage> {
       appBar: AppBar(
         backgroundColor: colorWhite,
         centerTitle: true,
-        title: const Text("Language"),
+        title:
+            Text(languageProvider.localizedStrings['Language'] ?? "Language"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -32,7 +33,8 @@ class _ChangeLangageState extends State<ChangeLangage> {
               child: Align(
                 alignment: AlignmentDirectional.topStart,
                 child: Text(
-                  'Select Language',
+                  languageProvider.localizedStrings['Select Language'] ??
+                      'Select Language',
                   style: GoogleFonts.poppins(
                       color: black, fontWeight: FontWeight.w500, fontSize: 17),
                 ),
@@ -52,7 +54,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Spanish",
+                languageProvider.localizedStrings['Spanish'] ?? "Spanish",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -70,7 +72,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "English",
+                languageProvider.localizedStrings['English'] ?? "English",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -88,7 +90,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "French",
+                languageProvider.localizedStrings['French'] ?? "French",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -106,7 +108,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Portuguese",
+                languageProvider.localizedStrings['Portuguese'] ?? "Portuguese",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -124,7 +126,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Catalan",
+                languageProvider.localizedStrings['Catalan'] ?? "Catalan",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -142,7 +144,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Valencian",
+                languageProvider.localizedStrings['Valencian'] ?? "Valencian",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -160,7 +162,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Galician",
+                languageProvider.localizedStrings['Galician'] ?? "Galician",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -178,7 +180,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Basque",
+                languageProvider.localizedStrings['Basque'] ?? "Basque",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),
@@ -196,7 +198,7 @@ class _ChangeLangageState extends State<ChangeLangage> {
                 size: 20,
               ),
               title: Text(
-                "Bable",
+                languageProvider.localizedStrings['Bable'] ?? "Bable",
                 style: GoogleFonts.poppins(color: black, fontSize: 16),
               ),
             ),

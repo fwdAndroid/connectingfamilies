@@ -1,6 +1,9 @@
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../provider/language_provider.dart';
 
 class ReportAccount extends StatefulWidget {
   const ReportAccount({super.key});
@@ -12,6 +15,8 @@ class ReportAccount extends StatefulWidget {
 class _ReportAccountState extends State<ReportAccount> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context); // Access
+
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -22,7 +27,8 @@ class _ReportAccountState extends State<ReportAccount> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Report Account'),
+        title: Text(languageProvider.localizedStrings['Report Account'] ??
+            'Report Account'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -34,7 +40,9 @@ class _ReportAccountState extends State<ReportAccount> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Report account with inappropriate behavior',
+              languageProvider.localizedStrings[
+                      'Report account with inappropriate behavior'] ??
+                  'Report account with inappropriate behavior',
               style: TextStyle(
                 fontSize: size.width * 0.045, // Responsive text size
                 fontWeight: FontWeight.bold,
@@ -45,7 +53,9 @@ class _ReportAccountState extends State<ReportAccount> {
             TextField(
               maxLines: 6,
               decoration: InputDecoration(
-                hintText: 'Type your message',
+                hintText:
+                    languageProvider.localizedStrings['Type your message'] ??
+                        'Type your message',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -79,7 +89,8 @@ class _ReportAccountState extends State<ReportAccount> {
                 onTap: () {
                   // Handle sending message
                 },
-                title: "Send Report",
+                title: languageProvider.localizedStrings['Send Report'] ??
+                    "Send Report",
               ),
             ),
           ],

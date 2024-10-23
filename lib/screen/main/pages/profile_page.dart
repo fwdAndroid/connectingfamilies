@@ -13,7 +13,10 @@ import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../../../provider/language_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -25,6 +28,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -92,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Favorite",
+                languageProvider.localizedStrings['Favorite'] ?? "Favorite",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -115,7 +120,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Notifications",
+                languageProvider.localizedStrings['Notifications'] ??
+                    "Notifications",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -138,7 +144,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Forgot Password",
+                languageProvider.localizedStrings['Forgot Password'] ??
+                    "Forgot Password",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -161,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Language",
+                languageProvider.localizedStrings['Language'] ?? "Language",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -184,7 +191,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Help & Support",
+                languageProvider.localizedStrings['Help & Support'] ??
+                    "Help & Support",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -207,7 +215,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Edit Profile",
+                languageProvider.localizedStrings['Edit Profile'] ??
+                    "Edit Profile",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -232,7 +241,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Legal Terms",
+                languageProvider.localizedStrings['Legal Terms'] ??
+                    "Legal Terms",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -254,7 +264,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Invite Friends",
+                languageProvider.localizedStrings['Invite Friends'] ??
+                    "Invite Friends",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -277,7 +288,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Parenting Help",
+                languageProvider.localizedStrings['Parenting Help'] ??
+                    "Parenting Help",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -300,7 +312,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 40,
               ),
               title: Text(
-                "Follow Us On Instagram",
+                languageProvider.localizedStrings['Follow Us On Instagram'] ??
+                    "Follow Us On Instagram",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,
@@ -310,7 +323,8 @@ class _ProfilePageState extends State<ProfilePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SaveButton(
-                  title: "Log out",
+                  title:
+                      languageProvider.localizedStrings['Log out'] ?? "Log out",
                   onTap: () {
                     showDialog<void>(
                       context: context,

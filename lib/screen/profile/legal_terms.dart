@@ -1,5 +1,7 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LegalTermsScreen extends StatefulWidget {
   @override
@@ -31,11 +33,14 @@ class _LegalTermsScreenState extends State<LegalTermsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context); // Access
+
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Legal Terms'),
+        title: Text(
+            languageProvider.localizedStrings['Legal Terms'] ?? 'Legal Terms'),
         centerTitle: true,
       ),
       body: Padding(

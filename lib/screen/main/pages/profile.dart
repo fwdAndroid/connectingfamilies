@@ -1,8 +1,10 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/profile/edit_profile.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String photo;
@@ -42,6 +44,8 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -99,7 +103,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         child: Align(
                           alignment: AlignmentDirectional.topStart,
                           child: Text(
-                            'Family description',
+                            languageProvider
+                                    .localizedStrings['Family description'] ??
+                                'Family description',
                             style: GoogleFonts.poppins(
                                 color: black,
                                 fontWeight: FontWeight.w500,
@@ -131,20 +137,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  _buildSectionTitle('Family Type'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Family Type'] ??
+                          'Family Type'),
                   _buildInfoContainer(widget.familyType),
-                  _buildSectionTitle('Date of Birth'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Date of Birth'] ??
+                          'Date of Birth'),
                   _buildInfoContainer(widget.dateofBirth),
-                  _buildSectionTitle('Special Situation'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Special Situation'] ??
+                          'Special Situation'),
                   _buildTag(widget.specialSituation),
-                  _buildSectionTitle('Parenting Style'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Parenting Style'] ??
+                          'Parenting Style'),
                   _buildTag(widget.parentingStyle),
-                  _buildSectionTitle('Nutrition'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Nutrition'] ??
+                          'Nutrition'),
                   _buildTag(widget.nutritions),
                   SizedBox(height: screenHeight * 0.02),
 
                   // Dynamic Hobbies Chips from Firebase
-                  _buildSectionTitle('Interests'),
+                  _buildSectionTitle(
+                      languageProvider.localizedStrings['Interests'] ??
+                          'Interests'),
                   Wrap(
                     spacing: 8.0,
                     runSpacing: 8.0,
@@ -165,7 +183,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             MaterialPageRoute(
                                 builder: (builder) => EditProfile()));
                       },
-                      title: 'Edit Profile',
+                      title:
+                          languageProvider.localizedStrings['Edit Profile'] ??
+                              'Edit Profile',
                     ),
                   ),
                 ],

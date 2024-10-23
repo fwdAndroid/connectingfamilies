@@ -7,6 +7,9 @@ import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../../provider/language_provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -34,6 +37,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -47,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Align(
                 alignment: AlignmentDirectional.topStart,
                 child: Text(
-                  'Photo',
+                  languageProvider.localizedStrings['Photo'] ?? 'Photo',
                   style: GoogleFonts.poppins(
                       color: black, fontWeight: FontWeight.w500, fontSize: 14),
                 ),
@@ -74,7 +79,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Full Name',
+                      languageProvider.localizedStrings['Full Name'] ??
+                          'Full Name',
                       style: GoogleFonts.poppins(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -102,7 +108,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Full Name",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Full Name'] ??
+                            "Enter Full Name",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
@@ -116,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Email',
+                      languageProvider.localizedStrings['Email'] ?? 'Email',
                       style: GoogleFonts.poppins(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -144,7 +152,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Email Address",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Email Address'] ??
+                            "Enter Email Address",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
@@ -158,7 +168,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Password',
+                      languageProvider.localizedStrings['Password'] ??
+                          'Password',
                       style: GoogleFonts.poppins(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -186,7 +197,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Password",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Password'] ??
+                            "Enter Password",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
@@ -200,7 +213,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Re-enter Password',
+                      languageProvider.localizedStrings['Re-enter Password'] ??
+                          'Re-enter Password',
                       style: GoogleFonts.poppins(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -228,7 +242,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Re-enter Password",
+                        hintText: languageProvider
+                                .localizedStrings['Re-enter Password'] ??
+                            "Re-enter Password",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
@@ -242,7 +258,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Phone Number',
+                      languageProvider.localizedStrings['Phone Number'] ??
+                          'Phone Number',
                       style: GoogleFonts.poppins(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -270,7 +287,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Phone Number",
+                        hintText:
+                            languageProvider.localizedStrings['Phone Number'] ??
+                                "Phone Number",
                         hintStyle:
                             GoogleFonts.poppins(color: black, fontSize: 12)),
                   ),
@@ -283,17 +302,41 @@ class _SignupScreenState extends State<SignupScreen> {
                   title: "Next",
                   onTap: () async {
                     if (image == null) {
-                      showMessageBar("Photo is Required", context);
+                      showMessageBar(
+                          languageProvider
+                                  .localizedStrings['Photo is Required'] ??
+                              "Photo is Required",
+                          context);
                     } else if (_fullNameController.text.isEmpty) {
-                      showMessageBar("User Name is Required", context);
+                      showMessageBar(
+                          languageProvider
+                                  .localizedStrings['User Name is Required'] ??
+                              "User Name is Required",
+                          context);
                     } else if (_emailController.text.isEmpty) {
-                      showMessageBar("Email is Required", context);
+                      showMessageBar(
+                          languageProvider
+                                  .localizedStrings['Email is Required'] ??
+                              "Email is Required",
+                          context);
                     } else if (_passwordController.text.isEmpty) {
-                      showMessageBar("Password is Required", context);
+                      showMessageBar(
+                          languageProvider
+                                  .localizedStrings['Password is Required'] ??
+                              "Password is Required",
+                          context);
                     } else if (_reenterController.text.isEmpty) {
-                      showMessageBar("Confirm Password is Required", context);
+                      showMessageBar(
+                          languageProvider.localizedStrings[
+                                  'Confirm Password is Required'] ??
+                              "Confirm Password is Required",
+                          context);
                     } else if (phoneController.text.isEmpty) {
-                      showMessageBar("Contact Number is Required ", context);
+                      showMessageBar(
+                          languageProvider.localizedStrings[
+                                  'Contact Number is Required'] ??
+                              "Contact Number is Required ",
+                          context);
                     } else {
                       setState(() {
                         isLoading = true;
@@ -321,10 +364,13 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text.rich(TextSpan(
-                    text: 'Already have an account? ',
+                    text: languageProvider
+                            .localizedStrings['Already have an account? '] ??
+                        'Already have an account? ',
                     children: <InlineSpan>[
                       TextSpan(
-                        text: 'Sign In',
+                        text: languageProvider.localizedStrings['Sign In'] ??
+                            'Sign In',
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -344,7 +390,8 @@ class _SignupScreenState extends State<SignupScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
-                "By @mamadepluton",
+                languageProvider.localizedStrings['By @mamadepluton'] ??
+                    "By @mamadepluton",
                 style: GoogleFonts.poppins(color: firstMainColor),
               ),
             )

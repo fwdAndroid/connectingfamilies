@@ -1,3 +1,4 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/auth/signup_screen.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
@@ -7,6 +8,7 @@ import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -33,6 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -50,7 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Column(
               children: [
                 Text(
-                  "Educating emotions with love",
+                  languageProvider.localizedStrings['language'] ??
+                      "Educating emotions with love",
                   style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -65,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Email',
+                      languageProvider.localizedStrings['Email'] ?? 'Email',
                       style: GoogleFonts.plusJakartaSans(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -93,7 +98,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Email Address",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Email Address'] ??
+                            "Enter Email Address",
                         hintStyle: GoogleFonts.plusJakartaSans(
                             color: black, fontSize: 12)),
                   ),
@@ -107,7 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
                     child: Text(
-                      'Password',
+                      languageProvider.localizedStrings['Password'] ??
+                          'Password',
                       style: GoogleFonts.plusJakartaSans(
                           color: black,
                           fontWeight: FontWeight.w500,
@@ -147,7 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide: BorderSide(color: borderColor)),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: borderColor)),
-                        hintText: "Enter Password",
+                        hintText: languageProvider
+                                .localizedStrings['Enter Password'] ??
+                            "Enter Password",
                         hintStyle: GoogleFonts.plusJakartaSans(
                             color: black, fontSize: 12)),
                   ),
@@ -171,7 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       Text(
-                        'Remember Me',
+                        languageProvider.localizedStrings['Remember Me'] ??
+                            'Remember Me',
                         style: GoogleFonts.plusJakartaSans(
                             color: black,
                             fontWeight: FontWeight.w500,
@@ -186,7 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             MaterialPageRoute(
                                 builder: (builder) => ForgotPassword()));
                       },
-                      child: Text("Forgot Password"))
+                      child: Text(languageProvider
+                              .localizedStrings['Forgot Password'] ??
+                          "Forgot Password"))
                 ],
               ),
             ),
@@ -195,12 +208,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 : Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SaveButton(
-                        title: "Login",
+                        title: languageProvider.localizedStrings['Login'] ??
+                            "Login",
                         onTap: () async {
                           if (_emailController.text.isEmpty ||
                               _passwordController.text.isEmpty) {
                             showMessageBar(
-                                "Email & Password is Required", context);
+                                languageProvider.localizedStrings[
+                                        'Email & Password is Required'] ??
+                                    "Email & Password is Required",
+                                context);
                           } else {
                             setState(() {
                               isLoading = true;
@@ -258,7 +275,9 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text.rich(TextSpan(
-                    text: 'Don’t have an account? ',
+                    text: languageProvider
+                            .localizedStrings['Don’t have an account? '] ??
+                        'Don’t have an account? ',
                     children: <InlineSpan>[
                       TextSpan(
                         text: 'Sign Up',
@@ -281,7 +300,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
-                "By @mamadepluton",
+                languageProvider.localizedStrings['By @mamadepluton'] ??
+                    "By @mamadepluton",
                 style: GoogleFonts.poppins(color: firstMainColor),
               ),
             )

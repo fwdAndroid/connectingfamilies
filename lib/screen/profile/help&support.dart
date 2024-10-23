@@ -1,6 +1,8 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HelpSupport extends StatefulWidget {
   const HelpSupport({super.key});
@@ -12,6 +14,7 @@ class HelpSupport extends StatefulWidget {
 class _HelpSupportState extends State<HelpSupport> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context); // Access
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -22,7 +25,7 @@ class _HelpSupportState extends State<HelpSupport> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Support'),
+        title: Text(languageProvider.localizedStrings['Support'] ?? 'Support'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -34,7 +37,8 @@ class _HelpSupportState extends State<HelpSupport> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Report technical issues',
+              languageProvider.localizedStrings['Report technical issues'] ??
+                  'Report technical issues',
               style: TextStyle(
                 fontSize: size.width * 0.045, // Responsive text size
                 fontWeight: FontWeight.bold,
@@ -58,7 +62,9 @@ class _HelpSupportState extends State<HelpSupport> {
                 // Handle adding screenshot
               },
               icon: Icon(Icons.add_photo_alternate_outlined),
-              label: Text('Add a Screenshot (optional)'),
+              label: Text(languageProvider
+                      .localizedStrings['Add a Screenshot (optional)'] ??
+                  'Add a Screenshot (optional)'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: colorWhite,
                 backgroundColor: firstMainColor,
@@ -79,7 +85,7 @@ class _HelpSupportState extends State<HelpSupport> {
                 onTap: () {
                   // Handle sending message
                 },
-                title: "Send",
+                title: languageProvider.localizedStrings['Send'] ?? "Send",
               ),
             ),
           ],

@@ -1,6 +1,8 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class NotifcationPage extends StatefulWidget {
   const NotifcationPage({super.key});
@@ -12,11 +14,14 @@ class NotifcationPage extends StatefulWidget {
 class _NotifcationPageState extends State<NotifcationPage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context); // Access
+
     return Scaffold(
       backgroundColor: colorWhite,
       appBar: AppBar(
         backgroundColor: colorWhite,
-        title: const Text("Notification"),
+        title: Text(languageProvider.localizedStrings['Notification'] ??
+            "Notification"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

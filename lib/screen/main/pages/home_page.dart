@@ -6,6 +6,9 @@ import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../../provider/language_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _emailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -32,7 +37,10 @@ class _HomePageState extends State<HomePage> {
                   return Center(child: CircularProgressIndicator());
                 }
                 if (!snapshot.hasData || snapshot.data == null) {
-                  return Center(child: Text('No data available'));
+                  return Center(
+                      child: Text(languageProvider
+                              .localizedStrings['No data available'] ??
+                          'No data available'));
                 }
                 var snap = snapshot.data;
                 return GestureDetector(
@@ -115,7 +123,8 @@ class _HomePageState extends State<HomePage> {
                       borderSide: BorderSide(color: borderColor)),
                   border: OutlineInputBorder(
                       borderSide: BorderSide(color: borderColor)),
-                  hintText: "Search",
+                  hintText:
+                      languageProvider.localizedStrings['Search'] ?? "Search",
                   hintStyle:
                       GoogleFonts.plusJakartaSans(color: black, fontSize: 12)),
             ),

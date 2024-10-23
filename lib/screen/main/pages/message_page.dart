@@ -1,7 +1,9 @@
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/chat/chat_message.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
@@ -13,13 +15,15 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       backgroundColor: colorWhite,
       appBar: AppBar(
         backgroundColor: colorWhite,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text("Chat"),
+        title: Text(languageProvider.localizedStrings['Chat'] ?? "Chat"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

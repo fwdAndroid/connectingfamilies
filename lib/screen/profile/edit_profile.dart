@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -240,10 +242,13 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider =
+        Provider.of<LanguageProvider>(context); // Access the provider
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Edit Profile",
+          languageProvider.localizedStrings['Edit Profile'] ?? "Edit Profile",
           style: GoogleFonts.poppins(
               fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
         ),
@@ -279,10 +284,18 @@ class _EditProfileState extends State<EditProfile> {
                   // Name field
                   buildTextField('Name', _nameController, 'Enter your name'),
                   // Phone Number field
-                  buildTextField('Phone Number', _phoneController,
-                      'Enter your phone number'),
+                  buildTextField(
+                      languageProvider.localizedStrings['Phone Number'] ??
+                          'Phone Number',
+                      _phoneController,
+                      languageProvider
+                              .localizedStrings['Enter your phone Number'] ??
+                          'Enter your phone number'),
                   // Family description field
-                  buildTextField('Family description', _descriptionController,
+                  buildTextField(
+                      languageProvider.localizedStrings['Family description'] ??
+                          'Family description',
+                      _descriptionController,
                       'Enter a brief description',
                       maxLines: 5),
                   // Location field
@@ -294,7 +307,10 @@ class _EditProfileState extends State<EditProfile> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Interests (Min 3):',
+                        Text(
+                            languageProvider
+                                    .localizedStrings['Interests (Min 3):'] ??
+                                'Interests (Min 3):',
                             style: TextStyle(fontSize: 16)),
                         Wrap(
                           children: selectedInterests
@@ -305,7 +321,9 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                         ElevatedButton(
                           onPressed: _showInterestMultiSelect,
-                          child: Text('Select Interests'),
+                          child: Text(languageProvider
+                                  .localizedStrings['Select Interests'] ??
+                              'Select Interests'),
                         ),
                       ],
                     ),
