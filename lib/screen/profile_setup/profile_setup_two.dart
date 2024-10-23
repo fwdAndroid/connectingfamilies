@@ -6,6 +6,7 @@ import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
+import 'package:connectingfamilies/uitls/image_picker.dart';
 
 class ProfileSetupTwo extends StatefulWidget {
   String familyDescription;
@@ -114,7 +115,12 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                     children: [
                       SizedBox(
                         width: 130,
-                        child: SaveButton(title: "Add", onTap: () {}),
+                        child: SaveButton(
+                            title: "Add",
+                            onTap: () {
+                              showMessageBar(
+                                  "Values Added Successfully", context);
+                            }),
                       ),
                     ],
                   ),
@@ -181,7 +187,12 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                     children: [
                       SizedBox(
                         width: 130,
-                        child: SaveButton(title: "Add", onTap: () {}),
+                        child: SaveButton(
+                            title: "Add",
+                            onTap: () {
+                              showMessageBar(
+                                  "Values Added Successfully", context);
+                            }),
                       ),
                     ],
                   ),

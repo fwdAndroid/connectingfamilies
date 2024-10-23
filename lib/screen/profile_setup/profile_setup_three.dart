@@ -144,7 +144,12 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                     children: [
                       SizedBox(
                         width: 130,
-                        child: SaveButton(title: "Add", onTap: () {}),
+                        child: SaveButton(
+                            title: "Add",
+                            onTap: () {
+                              showMessageBar(
+                                  "Values Added Successfully", context);
+                            }),
                       ),
                     ],
                   ),
