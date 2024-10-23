@@ -16,7 +16,11 @@ class _MainDashboardState extends State<MainDashboard> {
   final List<Widget> _screens = [
     HomePage(), // Replace with your screen widgets
     FavouritePage(),
-    Webpage(),
+    Webpage(
+      title: "",
+      url:
+          'https://mamadepluton.com/mamadepluton/?taxonomy=nav_menu&term=menu-secundario',
+    ),
     MessagePage(),
     ProfilePage()
   ];

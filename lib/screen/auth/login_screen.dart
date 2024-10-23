@@ -2,6 +2,7 @@ import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/auth/signup_screen.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
+import 'package:connectingfamilies/screen/main/pages/webpage.dart';
 import 'package:connectingfamilies/service/database.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/uitls/image_picker.dart';
@@ -289,20 +290,40 @@ class _LoginScreenState extends State<LoginScreen> {
                     ])),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                "assets/m.png",
-                height: 104,
-                width: 104,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => Webpage(
+                            title: "",
+                            url: "https://mamadepluton.com/mamadepluton")));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  "assets/m.png",
+                  height: 104,
+                  width: 104,
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                languageProvider.localizedStrings['By @mamadepluton'] ??
-                    "By @mamadepluton",
-                style: GoogleFonts.poppins(color: firstMainColor),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => Webpage(
+                              title: "",
+                              url: "https://mamadepluton.com/mamadepluton")));
+                },
+                child: Text(
+                  languageProvider.localizedStrings['By @mamadepluton'] ??
+                      "By @mamadepluton",
+                  style: GoogleFonts.poppins(color: firstMainColor),
+                ),
               ),
             )
           ],

@@ -279,8 +279,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 40,
               ),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => Webpage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => Webpage(
+                              title: "",
+                              url:
+                                  "https://mamadepluton.com/mamadepluton/?taxonomy=nav_menu&term=menu-secundario",
+                            )));
               },
               trailing: Icon(
                 Icons.keyboard_arrow_right,
@@ -303,8 +309,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 40,
               ),
               onTap: () {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (builder) => FavouritePage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => Webpage(
+                              title: "",
+                              url: "https://www.instagram.com/mamadepluton/",
+                            )));
               },
               trailing: Icon(
                 Icons.keyboard_arrow_right,

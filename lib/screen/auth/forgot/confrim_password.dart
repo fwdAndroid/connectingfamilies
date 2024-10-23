@@ -1,5 +1,6 @@
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/login_screen.dart';
+import 'package:connectingfamilies/screen/main/pages/webpage.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
@@ -63,15 +64,41 @@ class _ConfrimPasswordState extends State<ConfrimPassword> {
           const SizedBox(
             height: 120,
           ),
-          Image.asset(
-            "assets/m.png",
-            height: 104,
-            width: 104,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (builder) => Webpage(
+                          title: "",
+                          url: "https://mamadepluton.com/mamadepluton")));
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                "assets/m.png",
+                height: 104,
+                width: 104,
+              ),
+            ),
           ),
-          Text(
-            languageProvider.localizedStrings['By @mamadepluton'] ??
-                "By @mamadepluton",
-            style: GoogleFonts.poppins(color: firstMainColor),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => Webpage(
+                            title: "",
+                            url: "https://mamadepluton.com/mamadepluton")));
+              },
+              child: Text(
+                languageProvider.localizedStrings['By @mamadepluton'] ??
+                    "By @mamadepluton",
+                style: GoogleFonts.poppins(color: firstMainColor),
+              ),
+            ),
           )
         ],
       ),
