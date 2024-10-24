@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _emailController.addListener(() {
       setState(() {
-        _searchText = _emailController.text.toLowerCase();
+        _searchText = _emailController.text;
       });
     });
   }
@@ -60,12 +60,11 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => OtherUserProfile(
+                            builder: (builder) => UserProfilePage(
                                   interest: snap['interest'] ??
                                       ['Others', 'Others', 'Others'],
                                   email: snap['email'] ?? "",
                                   familyType: snap['familyType'] ?? "",
-                                  favorite: snap['favorite'] ?? [],
                                   location: snap['location'] ?? "",
                                   dateofBirth: snap['dateofBirth'] ?? "",
                                   specialSituation:
@@ -169,7 +168,8 @@ class _HomePageState extends State<HomePage> {
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final fullName = (doc.data()
                         as Map<String, dynamic>)['fullName'] as String;
-                    return fullName.toLowerCase().contains(_searchText);
+                    return fullName.toLowerCase().contains(
+                        _searchText.toLowerCase()); // Convert both to lowercase
                   }).toList();
 
                   if (filteredDocs.isEmpty) {
