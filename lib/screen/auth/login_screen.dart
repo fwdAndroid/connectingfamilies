@@ -311,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
         "confrimPassword": "No Password Available",
         "favorite": [],
         "interest": ["Board Games", "Ball Park", "Pet Walks"],
-        "dateOfBirth": "1990-10-10",
+        "dateOfBirth": "2024-10-23",
         "location": locationString,
         "nutritions": "No Preference",
         "parentingStyle": "Moderate use of electronic devices",

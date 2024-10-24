@@ -48,7 +48,7 @@ class OtherUserProfile extends StatefulWidget {
 }
 
 class _OtherUserProfileState extends State<OtherUserProfile> {
-  late bool isFavorite;
+  late bool isFavorite = false;
 
   @override
   void initState() {

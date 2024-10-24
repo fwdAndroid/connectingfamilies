@@ -19,6 +19,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController _emailController = TextEditingController();
+  String _searchText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(() {
+      setState(() {
+        _searchText = _emailController.text.toLowerCase();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
@@ -48,20 +60,24 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => UserProfilePage(
-                                  photo: snap['photo'],
-                                  email: snap['email'],
-                                  familyDescription: snap['familyDescription'],
-                                  fullName: snap['fullName'],
-                                  location: snap['location'],
-                                  dateofBirth: snap['dateofBirth'],
-                                  interest: snap['interest'],
-                                  nutritions: snap['nutritions'],
-                                  parentingStyle: snap['parentingStyle'],
-                                  familyType: snap['familyType'],
-                                  specialSituation: snap['specialSituation'],
-                                  phoneNumber: snap['phoneNumber'],
-                                  uuid: snap['uuid'],
+                            builder: (builder) => OtherUserProfile(
+                                  interest: snap['interest'] ??
+                                      ['Others', 'Others', 'Others'],
+                                  email: snap['email'] ?? "",
+                                  familyType: snap['familyType'] ?? "",
+                                  favorite: snap['favorite'] ?? [],
+                                  location: snap['location'] ?? "",
+                                  dateofBirth: snap['dateofBirth'] ?? "",
+                                  specialSituation:
+                                      snap['specialSituation'] ?? "",
+                                  parentingStyle: snap['parentingStyle'] ?? "",
+                                  nutritions: snap['nutritions'] ?? "",
+                                  phoneNumber: snap['phoneNumber'] ?? "",
+                                  uuid: snap['uuid'] ?? "",
+                                  fullName: snap['fullName'] ?? "",
+                                  photo: snap['photo'] ?? "",
+                                  familyDescription:
+                                      snap['familyDescription'] ?? "",
                                 )));
                   },
                   child: Padding(
@@ -82,7 +98,7 @@ class _HomePageState extends State<HomePage> {
             child: TextFormField(
               controller: _emailController,
               style: GoogleFonts.plusJakartaSans(color: black),
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   prefixIcon: Icon(
                     Icons.search,
@@ -99,8 +115,7 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                   builder: (builder) => FilterScreen()));
                         },
-                        icon: Icon(Icons.filter_list,
-                            color: Colors.teal), // Filter icon
+                        icon: Icon(Icons.filter_list, color: Colors.teal),
                       ),
                       IconButton(
                         onPressed: () {
@@ -110,8 +125,7 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                   builder: (builder) => FilterScreen()));
                         },
-                        icon: Icon(Icons.tune,
-                            color: black), // Settings/adjust icon
+                        icon: Icon(Icons.tune, color: black),
                       ),
                     ],
                   ),
@@ -130,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: StreamBuilder(
+            child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection("users")
                     .where("uuid",
@@ -150,6 +164,23 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   }
+
+                  // Filter the users based on search input
+                  final filteredDocs = snapshot.data!.docs.where((doc) {
+                    final fullName = (doc.data()
+                        as Map<String, dynamic>)['fullName'] as String;
+                    return fullName.toLowerCase().contains(_searchText);
+                  }).toList();
+
+                  if (filteredDocs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No Results Found",
+                        style: TextStyle(color: black),
+                      ),
+                    );
+                  }
+
                   return GridView.builder(
                     padding: EdgeInsets.all(16),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -159,34 +190,34 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSpacing: 16,
                       childAspectRatio: 0.8,
                     ),
-                    itemCount: snapshot.data!.docs.length,
+                    itemCount: filteredDocs.length,
                     itemBuilder: (context, index) {
-                      final List<DocumentSnapshot> documents =
-                          snapshot.data!.docs;
                       final Map<String, dynamic> data =
-                          documents[index].data() as Map<String, dynamic>;
+                          filteredDocs[index].data() as Map<String, dynamic>;
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (builder) => OtherUserProfile(
-                                        interest: data['interest'],
-                                        email: data['email'],
-                                        familyType: data['familyType'],
-                                        favorite: data['favorite'],
-                                        location: data['location'],
-                                        dateofBirth: data['dateofBirth'],
+                                        interest: data['interest'] ??
+                                            ['Others', 'Others', 'Others'],
+                                        email: data['email'] ?? "",
+                                        familyType: data['familyType'] ?? "",
+                                        favorite: data['favorite'] ?? [],
+                                        location: data['location'] ?? "",
+                                        dateofBirth: data['dateofBirth'] ?? "",
                                         specialSituation:
-                                            data['specialSituation'],
-                                        parentingStyle: data['parentingStyle'],
-                                        nutritions: data['nutritions'],
-                                        phoneNumber: data['phoneNumber'],
-                                        uuid: data['uuid'],
-                                        fullName: data['fullName'],
-                                        photo: data['photo'],
+                                            data['specialSituation'] ?? "",
+                                        parentingStyle:
+                                            data['parentingStyle'] ?? "",
+                                        nutritions: data['nutritions'] ?? "",
+                                        phoneNumber: data['phoneNumber'] ?? "",
+                                        uuid: data['uuid'] ?? "",
+                                        fullName: data['fullName'] ?? "",
+                                        photo: data['photo'] ?? "",
                                         familyDescription:
-                                            data['familyDescription'],
+                                            data['familyDescription'] ?? "",
                                       )));
                         },
                         child: Container(
@@ -205,11 +236,9 @@ class _HomePageState extends State<HomePage> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(24),
                                       child: Image.network(
-                                        data[
-                                            'photo'], // Replace with your image link
+                                        data['photo'],
                                         height: 120,
                                         width: 120,
-
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -225,8 +254,7 @@ class _HomePageState extends State<HomePage> {
                                     right: 8,
                                     child: Image.asset(
                                       'assets/v.png',
-                                      height:
-                                          30, // Replace with your image link
+                                      height: 30,
                                     ),
                                   ),
                                 ],
