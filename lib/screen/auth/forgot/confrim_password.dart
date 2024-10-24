@@ -35,27 +35,33 @@ class _ConfrimPasswordState extends State<ConfrimPassword> {
           Column(
             children: [
               Text(
-                languageProvider.localizedStrings['Password Created'] ??
-                    "Password Created",
+                languageProvider.localizedStrings['Create Password'] ??
+                    "Create Password",
                 style: GoogleFonts.poppins(
                     fontSize: 24, fontWeight: FontWeight.w600, color: black),
               ),
-              Text(
-                languageProvider.localizedStrings[
-                        'Your password is created Successfully'] ??
-                    "Your password is created Successfully",
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: textColor),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    languageProvider.localizedStrings[
+                            'A link is send in your email id so you easily recreate your password successfully'] ??
+                        "A link is send in your email id so you easily recreate your password successfully",
+                    style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textColor),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
             ],
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SaveButton(
-                title: languageProvider.localizedStrings['Create Password'] ??
-                    "Create Password",
+                title: languageProvider.localizedStrings['Back To Login'] ??
+                    "Back To Login",
                 onTap: () async {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (builder) => LoginScreen()));
