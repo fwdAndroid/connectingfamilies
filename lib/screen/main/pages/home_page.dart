@@ -103,30 +103,15 @@ class _HomePageState extends State<HomePage> {
                     Icons.search,
                     color: iconColor,
                   ),
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          // Handle filter action
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => FilterScreen()));
-                        },
-                        icon: Icon(Icons.filter_list, color: Colors.teal),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // Handle settings action
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => FilterScreen()));
-                        },
-                        icon: Icon(Icons.tune, color: black),
-                      ),
-                    ],
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      // Handle filter action
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => FilterScreen()));
+                    },
+                    icon: Icon(Icons.filter_list, color: Colors.teal),
                   ),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: borderColor)),

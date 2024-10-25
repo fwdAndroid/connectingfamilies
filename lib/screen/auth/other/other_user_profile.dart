@@ -162,34 +162,75 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                             var snap = snapshot.data;
                             return GestureDetector(
                               onTap: () async {
-                                // Add navigation to chat
-                                await FirebaseFirestore.instance
+                                final currentUserId =
+                                    FirebaseAuth.instance.currentUser!.uid;
+                                final friendId = widget.uuid;
+                                final chatQuery = await FirebaseFirestore
+                                    .instance
                                     .collection("chats")
-                                    .doc(uuid)
-                                    .set({
-                                  "chatId": uuid,
-                                  "userId":
-                                      FirebaseAuth.instance.currentUser!.uid,
-                                  "userName": snap['fullName'],
-                                  "userPhoto": snap['photo'],
-                                  "friendId": widget.uuid,
-                                  "friendName": widget.fullName,
-                                  "friendPhoto": widget.photo,
-                                }).then((onValue) {
+                                    .where("userId", isEqualTo: currentUserId)
+                                    .where("friendId", isEqualTo: friendId)
+                                    .get();
+
+                                final reverseChatQuery = await FirebaseFirestore
+                                    .instance
+                                    .collection("chats")
+                                    .where("userId", isEqualTo: friendId)
+                                    .where("friendId", isEqualTo: currentUserId)
+                                    .get();
+
+                                if (chatQuery.docs.isNotEmpty ||
+                                    reverseChatQuery.docs.isNotEmpty) {
+                                  // If chat exists, get the existing chat document ID
+                                  var chatDoc = chatQuery.docs.isNotEmpty
+                                      ? chatQuery.docs.first
+                                      : reverseChatQuery.docs.first;
+
+                                  // Navigate to the chat page without creating a new document
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (builder) => ChatMessages(
-                                                chatUUid: uuid,
-                                                userId: FirebaseAuth
-                                                    .instance.currentUser!.uid,
-                                                userName: snap['fullName'],
-                                                userPhoto: snap['photo'],
-                                                friendId: widget.uuid,
-                                                friendName: widget.fullName,
-                                                friendPhoto: widget.photo,
-                                              )));
-                                });
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatMessages(
+                                        chatUUid: chatDoc['chatId'],
+                                        userId: currentUserId,
+                                        userName: snap['fullName'],
+                                        userPhoto: snap['photo'],
+                                        friendId: friendId,
+                                        friendName: widget.fullName,
+                                        friendPhoto: widget.photo,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // If no chat exists, create a new chat document
+                                  await FirebaseFirestore.instance
+                                      .collection("chats")
+                                      .doc(uuid)
+                                      .set({
+                                    "chatId": uuid,
+                                    "userId": currentUserId,
+                                    "userName": snap['fullName'],
+                                    "userPhoto": snap['photo'],
+                                    "friendId": friendId,
+                                    "friendName": widget.fullName,
+                                    "friendPhoto": widget.photo,
+                                  });
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatMessages(
+                                        chatUUid: uuid,
+                                        userId: currentUserId,
+                                        userName: snap['fullName'],
+                                        userPhoto: snap['photo'],
+                                        friendId: friendId,
+                                        friendName: widget.fullName,
+                                        friendPhoto: widget.photo,
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,

@@ -1,29 +1,139 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectingfamilies/screen/auth/other/other_user_profile.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
+import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({super.key});
+  const FilterScreen({Key? key}) : super(key: key);
 
   @override
   State<FilterScreen> createState() => _FilterScreenState();
 }
 
 class _FilterScreenState extends State<FilterScreen> {
+  double _currentAge = 25;
+  double _location = 50; // Default value
+
+  String selectedNutrition = 'No Preference'; // Default values
+  String selectedparentingStyle = 'Avoid using electronic devices';
+  String selectedSpecialSituation = 'Wheel chair';
+  String selectedInterest = 'Camping';
+
+  List<DocumentSnapshot> filteredUsers = []; // Store filtered results
+
+  final List<String> nutritionOptions = [
+    "No Preference",
+    "Ultra-Processed Foods Free",
+    "Vegan",
+    "Vegetarian",
+    "Gluten Free",
+    "Sugar Free",
+    "Pork free",
+    "Others",
+  ];
+
+  final List<String> parentingStyleOptions = [
+    "Avoid using electronic devices",
+    "Free use of electronic devices",
+    "Moderate use of electronic devices",
+    "Respectful Parenting",
+    "A Slap in Time",
+    "Never Slap in Time",
+    "My children have Phone",
+    "Others",
+  ];
+
+  final List<String> specialSituationOptions = [
+    "Wheel chair",
+    "Rare Disease",
+    "Mobility Problems",
+    "Autism",
+    "TDAH",
+    "High Capacities",
+    "Vision Problems",
+    "Others",
+    "Asperger",
+  ];
+
+  final List<String> interestOptions = [
+    "Camping",
+    "Hikking",
+    "Traveling",
+    "Take a Walk",
+    "Board Games",
+    "Out Door Activities",
+    "Ball Park",
+    "Cycling",
+    "Pet Walks",
+    "Soccer",
+    "Cultural Activities",
+    "Basket",
+    "Skating",
+    "Beach",
+    "Reading (Books)",
+    "Sports",
+    "Laser Games",
+    "Scape Rooms",
+    "Peaceful Activities",
+    "City Family",
+    "Going to the Park",
+    "Country Side Family",
+    "Others",
+  ];
+
+  // Method to get filtered results from Firestore
+
+  // Method to get filtered results from Firestore
+  Future<void> getFilteredResults() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Construct the query with selected filters
+    Query query = firestore.collection('users');
+
+    // Apply filters only if a value is selected (changed from the default)
+    if (selectedNutrition != 'No Preference') {
+      query = query.where('nutrition', isEqualTo: selectedNutrition);
+      print('Applied Nutrition Filter: $selectedNutrition');
+    }
+
+    if (selectedparentingStyle != 'Moderate use of electronic devices') {
+      query = query.where('parentingStyle', isEqualTo: selectedparentingStyle);
+      print('Applied Parenting Style Filter: $selectedparentingStyle');
+    }
+
+    if (selectedSpecialSituation != 'None') {
+      query =
+          query.where('specialSituation', isEqualTo: selectedSpecialSituation);
+      print('Applied Special Situation Filter: $selectedSpecialSituation');
+    }
+
+    if (selectedInterest.isNotEmpty) {
+      query = query.where('interest', arrayContains: selectedInterest);
+      print('Applied Interest Filter: $selectedInterest');
+    }
+
+    // Execute the query and handle results
+    try {
+      QuerySnapshot results = await query.get();
+      setState(() {
+        filteredUsers = results.docs;
+      });
+
+      print('Filtered Users Count: ${filteredUsers.length}');
+    } catch (e) {
+      print('Error fetching filtered users: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-    double _currentAge = 25; // Default age
-
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: Text(
-          'Search Filters',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: Text('Search Filters'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -32,12 +142,6 @@ class _FilterScreenState extends State<FilterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                fit: BoxFit.cover,
-                "assets/Group 8195.png",
-                width: MediaQuery.of(context).size.width,
-              ),
-              // Distance from Location
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -46,13 +150,26 @@ class _FilterScreenState extends State<FilterScreen> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
+
+              // Location Slider
               Slider(
-                value: 50,
+                value: _location,
                 min: 0,
                 max: 100,
+                divisions: 100,
+                label: _location.round().toString(),
                 activeColor: firstMainColor,
-                onChanged: (value) {},
+                onChanged: (double value) {
+                  setState(() {
+                    _location = value; // Update location value
+                  });
+                },
               ),
+              Text(
+                '${_location.round()} km', // Showing rounded value in km
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+
               // Recents
               SizedBox(height: screenHeight * 0.02),
               Text(
@@ -71,6 +188,11 @@ class _FilterScreenState extends State<FilterScreen> {
                   });
                 },
               ),
+              Text(
+                '${_currentAge.round()} Years Old', // Showing rounded value in km
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+
               // Recents
               SizedBox(height: screenHeight * 0.02),
               Text(
@@ -78,80 +200,179 @@ class _FilterScreenState extends State<FilterScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildChip('Interest'),
-                  _buildChip('Family Type'),
                   _buildChip('Nutrition'),
                 ],
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildChip('Family Situation'),
                   _buildChip('Parenting Style'),
                 ],
               ),
+              SizedBox(height: screenHeight * 0.02),
 
               Text(
-                'Recents',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                'Select Nutrition',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: screenHeight * 0.01),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Alina Service'),
-                  Icon(Icons.close, color: Colors.grey),
-                ],
+              DropdownButton<String>(
+                value: selectedNutrition,
+                items: nutritionOptions.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedNutrition = newValue!;
+                  });
+                },
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Qasim Suri'),
-                  Icon(Icons.close, color: Colors.grey),
-                ],
+              Text(
+                'Select Parenting Style',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Alina Watch'),
-                  Icon(Icons.close, color: Colors.grey),
-                ],
+              DropdownButton<String>(
+                value: selectedparentingStyle,
+                items: parentingStyleOptions.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedparentingStyle = newValue!;
+                  });
+                },
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child:
-                      Text('Clear all', style: TextStyle(color: Colors.teal)),
+              Text(
+                'Select Special Situation',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              DropdownButton<String>(
+                value: selectedSpecialSituation,
+                items: specialSituationOptions.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSpecialSituation = newValue!;
+                  });
+                },
+              ),
+              Text(
+                'Select Interest',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              DropdownButton<String>(
+                value: selectedInterest,
+                items: interestOptions.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedInterest = newValue!;
+                  });
+                },
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: SaveButton(
+                    onTap: () async {
+                      await getFilteredResults();
+                    },
+                    title: 'Apply Filters',
+                  ),
                 ),
               ),
-              SizedBox(height: screenHeight * 0.02),
-              // Popular Search
-              Text(
-                'Popular Search',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: screenHeight * 0.01),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: [
-                  _buildChip('Interest'),
-                  _buildChip('Family Situation'),
-                  _buildChip('Family Type'),
-                  _buildChip('Parenting Style'),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              // Latest View Profile
-              Text(
-                'Latest View Profile',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: screenHeight * 0.01),
-              _buildProfileCard(context, screenHeight),
+              SizedBox(height: 20),
+              // Display filtered results in Card format
+              filteredUsers.isNotEmpty
+                  ? SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                        physics:
+                            NeverScrollableScrollPhysics(), // Disable ListView scroll inside SingleChildScrollView
+                        shrinkWrap:
+                            true, // Make ListView take only required height
+                        itemCount: filteredUsers.length,
+                        itemBuilder: (context, index) {
+                          var user = filteredUsers[index];
+                          return Card(
+                            elevation: 5,
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(user['photo']),
+                                  ),
+                                  title: Text(
+                                    user['fullName'],
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        OtherUserProfile(
+                                                          photo: user['photo'],
+                                                          favorite:
+                                                              user['favorite'],
+                                                          email: user['email'],
+                                                          specialSituation: user[
+                                                              'specialSituation'],
+                                                          familyType: user[
+                                                              'familyType'],
+                                                          fullName:
+                                                              user['fullName'],
+                                                          location:
+                                                              user['location'],
+                                                          dateofBirth: user[
+                                                              'dateofBirth'],
+                                                          interest:
+                                                              user['interest'],
+                                                          familyDescription: user[
+                                                              'familyDescription'],
+                                                          nutritions: user[
+                                                              'nutritions'],
+                                                          parentingStyle: user[
+                                                              'parentingStyle'],
+                                                          phoneNumber: user[
+                                                              'phoneNumber'],
+                                                          uuid: user['uuid'],
+                                                        )));
+                                          },
+                                          child: Text('View Profile'))
+                                    ],
+                                  ),
+                                )),
+                          );
+                        },
+                      ),
+                    )
+                  : Text('No results found based on selected filters'),
             ],
           ),
         ),
@@ -166,46 +387,6 @@ class _FilterScreenState extends State<FilterScreen> {
         style: TextStyle(color: Colors.teal),
       ),
       backgroundColor: Color(0xFFE3F4FF),
-    );
-  }
-
-  Widget _buildProfileCard(BuildContext context, double screenHeight) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: ListTile(
-        leading: Image.asset('assets/pic.png' // Replace with your asset path
-            ),
-        title: Text('Andrew Fries'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Quetta'),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Text(
-                  'View Profile',
-                  style: TextStyle(color: firstMainColor),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  'Chat Now',
-                  style: TextStyle(color: firstMainColor),
-                ),
-              ],
-            )
-          ],
-        ),
-        trailing: Icon(
-          Icons.favorite,
-          color: red,
-        ),
-      ),
     );
   }
 }
