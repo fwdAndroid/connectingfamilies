@@ -70,5 +70,16 @@
     "Notification": "Jakinarazpena",
     "Report account with inappropriate behavior": "Txosten kontua jokabide desegokiarekin",
     "Send Report": "Bidali txostena",
-    "App & Site Regulations": "Aplikazio eta gunearen arauak"
+    "App & Site Regulations": "Aplikazio eta gunearen arauak",
+    "A link is send in your email id so you easily recreate your password successfully": "Lotura bat bidali da zure email helbideari, pasahitza arrakastaz berreskuratzeko.",
+    "Back To Login": "Itzuli Saioa Hasi",
+    "Reset Password": "Pasahitza Berrezarri",
+    "Oh No, You are Deleting The Account": "Oharra, Kontua Ezabatzen Ari Zara",
+    "Are you sure you want to delete?": "Ziur ezabatu nahi duzula?",
+    "Account deleted successfully": "Kontua arrakastaz ezabatu da",
+    "No": "Ez",
+    "Yes": "Bai",
+    "Oh No, You are leaving": "Oharra, Irtenar zaude",
+    "Are you sure you want to logout?": "Ziur saioa itxi nahi duzula?",
+    "Logout Successfully": "Saioa arrakastaz itxi da"
 }

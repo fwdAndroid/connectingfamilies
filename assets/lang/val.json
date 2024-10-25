@@ -70,5 +70,16 @@
     "Notification": "Notificació",
     "Report account with inappropriate behavior": "Denunciar compte amb comportament inadequat",
     "Send Report": "Enviar informe",
-    "App & Site Regulations": "Regulacions de l'aplicació i del lloc"
+    "App & Site Regulations": "Regulacions de l'aplicació i del lloc",
+    "A link is send in your email id so you easily recreate your password successfully": "S'ha enviat un enllaç al teu correu electrònic perquè pugues restablir la contrasenya amb èxit",
+    "Back To Login": "Tornar a l'inici de sessió",
+    "Reset Password": "Restablir la contrasenya",
+    "Oh No, You are Deleting The Account": "Oh no, estàs eliminant el compte",
+    "Are you sure you want to delete?": "Estàs segur que vols eliminar-ho?",
+    "Account deleted successfully": "Compte eliminat correctament",
+    "No": "No",
+    "Yes": "Sí",
+    "Oh No, You are leaving": "Oh no, estàs eixint",
+    "Are you sure you want to logout?": "Estàs segur que vols tancar la sessió?",
+    "Logout Successfully": "Sessió tancada amb èxit"
 }

@@ -71,5 +71,17 @@
     "Notification":"Notification",
     "Report account with inappropriate behavior":"Report account with inappropriate behavior",
     "Send Report":"Send Report",
-    "App & Site Regulations":"App & Site Regulations"
+    "App & Site Regulations":"App & Site Regulations",
+    "A link is send in your email id so you easily recreate your password successfully":"A link is send in your email id so you easily recreate your password successfully",
+    "Back To Login":"Back To Login",
+    "Reset Password":"Reset Password",
+    "Oh No, You are Deleting The Account":"Oh No, You are Deleting The Account",
+    "Are you sure you want to delete?":"Are you sure you want to delete?",
+    "Account deleted successfully":"Account deleted successfully",
+    "No":"No",
+    "Yes":"Yes",
+    "Oh No, You are leaving":"Oh No, You are leaving",
+    "Are you sure you want to logout?":"Are you sure you want to logout?",
+    "Logout Successfully":"Logout Successfully"
+    
 }

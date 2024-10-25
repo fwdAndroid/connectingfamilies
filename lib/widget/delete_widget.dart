@@ -1,16 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/login_screen.dart';
+import 'package:connectingfamilies/screen/main/pages/webpage.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class DeleteWidget extends StatelessWidget {
   const DeleteWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       content: Column(
@@ -19,27 +24,50 @@ class DeleteWidget extends StatelessWidget {
           SingleChildScrollView(
             child: ListBody(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(
-                    "assets/m.png",
-                    height: 104,
-                    width: 104,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (builder) => Webpage(
+                                title: "",
+                                url: "https://mamadepluton.com/mamadepluton")));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      "assets/m.png",
+                      height: 104,
+                      width: 104,
+                    ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    "By @mamadepluton",
-                    style: GoogleFonts.poppins(color: firstMainColor),
-                    textAlign: TextAlign.center,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => Webpage(
+                                  title: "",
+                                  url:
+                                      "https://mamadepluton.com/mamadepluton")));
+                    },
+                    child: Text(
+                      languageProvider.localizedStrings['By @mamadepluton'] ??
+                          "By @mamadepluton",
+                      style: GoogleFonts.poppins(color: firstMainColor),
+                    ),
                   ),
                 ),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Oh No, You are Deleting The Account",
+                      languageProvider.localizedStrings[
+                              'Oh No, You are Deleting The Account'] ??
+                          "Oh No, You are Deleting The Account",
                       style: GoogleFonts.workSans(
                         fontWeight: FontWeight.w500,
                         fontSize: 18,
@@ -52,7 +80,9 @@ class DeleteWidget extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Are you sure you want to delete?",
+                      languageProvider.localizedStrings[
+                              'Are you sure you want to delete?'] ??
+                          "Are you sure you want to delete?",
                       style: GoogleFonts.workSans(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -77,7 +107,7 @@ class DeleteWidget extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Text(
-                "No",
+                languageProvider.localizedStrings['No'] ?? "No",
                 style: TextStyle(color: Colors.black),
               ),
             ),
@@ -104,7 +134,10 @@ class DeleteWidget extends StatelessWidget {
 
                     // Optionally, navigate to a sign-in page or show a success message
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Account deleted successfully")),
+                      SnackBar(
+                          content: Text(languageProvider.localizedStrings[
+                                  'Account deleted successfully'] ??
+                              "Account deleted successfully")),
                     );
 
                     // Navigate back to the sign-in page
@@ -125,7 +158,7 @@ class DeleteWidget extends StatelessWidget {
                 // Show snack bar message
               },
               child: Text(
-                "Yes",
+                languageProvider.localizedStrings['Yes'] ?? "Yes",
                 style: TextStyle(color: colorWhite),
               ),
               style: ElevatedButton.styleFrom(

@@ -70,5 +70,16 @@
     "Notification": "Notificação",
     "Report account with inappropriate behavior": "Denunciar conta com comportamento inadequado",
     "Send Report": "Enviar relatório",
-    "App & Site Regulations": "Regulamentos do aplicativo e do site"
+    "App & Site Regulations": "Regulamentos do aplicativo e do site",
+    "A link is send in your email id so you easily recreate your password successfully": "Um link foi enviado para seu e-mail para que você possa recriar sua senha com sucesso",
+    "Back To Login": "Voltar ao login",
+    "Reset Password": "Redefinir senha",
+    "Oh No, You are Deleting The Account": "Oh não, você está excluindo a conta",
+    "Are you sure you want to delete?": "Tem certeza de que deseja excluir?",
+    "Account deleted successfully": "Conta excluída com sucesso",
+    "No": "Não",
+    "Yes": "Sim",
+    "Oh No, You are leaving": "Oh não, você está saindo",
+    "Are you sure you want to logout?": "Tem certeza de que deseja sair?",
+    "Logout Successfully": "Logout realizado com sucesso"
 }
