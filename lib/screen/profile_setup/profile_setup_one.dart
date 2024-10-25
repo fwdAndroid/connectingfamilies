@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_two.dart';
 import 'package:connectingfamilies/service/location_service.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
@@ -11,7 +10,7 @@ import 'package:group_button/group_button.dart';
 import 'package:intl/intl.dart';
 
 class ProfileSetupOne extends StatefulWidget {
-  Uint8List image;
+  final Uint8List image;
   final String phoneNumber;
   final String confirmPassword;
   final String password;
@@ -33,16 +32,23 @@ class ProfileSetupOne extends StatefulWidget {
 }
 
 class _ProfileSetupOneState extends State<ProfileSetupOne> {
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
-  TextEditingController othersController = TextEditingController();
-  TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController othersController = TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
   String dropdownValue = 'Woman';
   bool showSpecialSituations = false;
   bool showOthersField = false;
   String selectedSpecialSituation = '';
 
+  // Controllers for new member input
+  final TextEditingController newMemberNameController = TextEditingController();
+  final TextEditingController newMemberAgeController = TextEditingController();
+
   final LocationService _locationService = LocationService();
+
+  // Manage members data
+  List<Member> members = [];
 
   final List<String> items = ['Woman', 'Man', 'Boy', 'Girl'];
 
@@ -65,6 +71,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
               buildFamilyTypeSection(),
               if (showSpecialSituations) buildSpecialSituationsSection(),
               if (showOthersField) buildOthersField(),
+              buildNewMemberSection(),
               buildMembersTable(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -216,18 +223,112 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     );
   }
 
+  Widget buildNewMemberSection() {
+    return Column(
+      children: [
+        buildSectionTitle('Add New Member'),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: newMemberNameController,
+                decoration: InputDecoration(
+                  hintText: 'Member Name',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: newMemberAgeController,
+                decoration: InputDecoration(
+                  hintText: 'Age',
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                if (newMemberNameController.text.isNotEmpty &&
+                    newMemberAgeController.text.isNotEmpty) {
+                  setState(() {
+                    members.add(Member(
+                      name: newMemberNameController.text,
+                      age: newMemberAgeController.text,
+                      specialSituation: selectedSpecialSituation.isNotEmpty
+                          ? selectedSpecialSituation
+                          : (showOthersField ? othersController.text : 'No'),
+                    ));
+                    newMemberNameController.clear();
+                    newMemberAgeController.clear();
+                    selectedSpecialSituation = '';
+                    showOthersField = false;
+                    othersController.clear();
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget buildMembersTable() {
     return Container(
       margin: const EdgeInsets.only(top: 20),
       child: Table(
         border: TableBorder.all(),
         children: [
-          buildTableRow(['Members', 'Age', 'Special Situation', 'Remove'],
+          buildTableRow(['Members', 'Age', 'Special Situation', 'Actions'],
               isHeader: true),
-          buildTableRow(['Man', '10', 'No', '']),
-          buildTableRow(['Boy', '12', 'Yes', '']),
+          for (var member in members) buildMemberRow(member),
         ],
       ),
+    );
+  }
+
+  TableRow buildTableRow(List<String> cells, {bool isHeader = false}) {
+    return TableRow(
+      children: cells.map((cell) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: isHeader
+              ? Text(cell, style: const TextStyle(fontWeight: FontWeight.bold))
+              : Text(cell),
+        );
+      }).toList(),
+    );
+  }
+
+  TableRow buildMemberRow(Member member) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(member.name),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(member.age),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(member.specialSituation),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            setState(() {
+              // Remove the member from the list
+              members.remove(member);
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -249,36 +350,15 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      lastDate: DateTime.now(),
     );
+
     if (pickedDate != null) {
       setState(() {
         dateOfBirthController.text =
             DateFormat('yyyy-MM-dd').format(pickedDate);
       });
     }
-  }
-
-  TableRow buildTableRow(List<String> cells, {bool isHeader = false}) {
-    return TableRow(
-      children: cells.map((cell) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: isHeader
-              ? Text(cell, style: const TextStyle(fontWeight: FontWeight.bold))
-              : cell.isNotEmpty
-                  ? TextFormField(
-                      initialValue: cell,
-                      decoration:
-                          const InputDecoration(border: InputBorder.none),
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {},
-                    ),
-        );
-      }).toList(),
-    );
   }
 
   Widget buildSectionWithTextField({
@@ -288,22 +368,22 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     int maxLines = 1,
   }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildSectionTitle(title),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
-          padding: const EdgeInsets.all(8),
-          child: TextFormField(
-            controller: controller,
-            maxLines: maxLines,
-            style: GoogleFonts.poppins(color: black),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xffF7F8F9),
-              hintText: hint,
-              hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-              border: const OutlineInputBorder(),
-            ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(color: black, fontSize: 12),
+          ),
+        ),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
+            border: const OutlineInputBorder(),
           ),
         ),
       ],
@@ -312,18 +392,20 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
 
   Widget buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, left: 16),
-      child: Align(
-        alignment: AlignmentDirectional.topStart,
-        child: Text(
-          title,
-          style: GoogleFonts.poppins(
-            color: black,
-            fontWeight: FontWeight.w500,
-            fontSize: 17,
-          ),
-        ),
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        title,
+        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
   }
+}
+
+class Member {
+  String name;
+  String age;
+  String specialSituation;
+
+  Member(
+      {required this.name, required this.age, required this.specialSituation});
 }
