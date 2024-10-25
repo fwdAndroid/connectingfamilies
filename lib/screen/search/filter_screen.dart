@@ -82,7 +82,11 @@ class _FilterScreenState extends State<FilterScreen> {
     "Others",
   ];
 
-  // Method to get filtered results from Firestore
+  // Track selected options
+  List<String> selectedNutritions = [];
+  List<String> selectedParentingStyles = [];
+  List<String> selectedSpecialSituations = [];
+  List<String> selectedInterests = [];
 
   // Method to get filtered results from Firestore
   Future<void> getFilteredResults() async {
@@ -91,26 +95,26 @@ class _FilterScreenState extends State<FilterScreen> {
     // Construct the query with selected filters
     Query query = firestore.collection('users');
 
-    // Apply filters only if a value is selected (changed from the default)
-    if (selectedNutrition != 'No Preference') {
-      query = query.where('nutrition', isEqualTo: selectedNutrition);
-      print('Applied Nutrition Filter: $selectedNutrition');
+    // Apply filters only if a value is selected
+    if (selectedNutritions.isNotEmpty) {
+      query = query.where('nutritions', whereIn: selectedNutritions);
+      print('Applied Nutrition Filter: $selectedNutritions');
     }
 
-    if (selectedparentingStyle != 'Moderate use of electronic devices') {
-      query = query.where('parentingStyle', isEqualTo: selectedparentingStyle);
-      print('Applied Parenting Style Filter: $selectedparentingStyle');
+    if (selectedParentingStyles.isNotEmpty) {
+      query = query.where('parentingStyle', whereIn: selectedParentingStyles);
+      print('Applied Parenting Style Filter: $selectedParentingStyles');
     }
 
-    if (selectedSpecialSituation != 'None') {
+    if (selectedSpecialSituations.isNotEmpty) {
       query =
-          query.where('specialSituation', isEqualTo: selectedSpecialSituation);
-      print('Applied Special Situation Filter: $selectedSpecialSituation');
+          query.where('specialSituation', whereIn: selectedSpecialSituations);
+      print('Applied Special Situation Filter: $selectedSpecialSituations');
     }
 
-    if (selectedInterest.isNotEmpty) {
-      query = query.where('interest', arrayContains: selectedInterest);
-      print('Applied Interest Filter: $selectedInterest');
+    if (selectedInterests.isNotEmpty) {
+      query = query.where('interest', arrayContainsAny: selectedInterests);
+      print('Applied Interest Filter: $selectedInterests');
     }
 
     // Execute the query and handle results
@@ -131,6 +135,7 @@ class _FilterScreenState extends State<FilterScreen> {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Search Filters'),
@@ -170,7 +175,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
-              // Recents
+              // Age Slider
               SizedBox(height: screenHeight * 0.02),
               Text(
                 'By Age',
@@ -193,100 +198,54 @@ class _FilterScreenState extends State<FilterScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
-              // Recents
+              // Type selection
               SizedBox(height: screenHeight * 0.02),
-              Text(
-                'By Type',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildChip('Interest'),
-                  _buildChip('Nutrition'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildChip('Family Situation'),
-                  _buildChip('Parenting Style'),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.02),
-
               Text(
                 'Select Nutrition',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              DropdownButton<String>(
-                value: selectedNutrition,
-                items: nutritionOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
+              Wrap(
+                spacing: 8.0,
+                children: nutritionOptions.map((option) {
+                  return _buildSelectableContainer(option, selectedNutritions);
                 }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedNutrition = newValue!;
-                  });
-                },
               ),
+
               Text(
                 'Select Parenting Style',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              DropdownButton<String>(
-                value: selectedparentingStyle,
-                items: parentingStyleOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
+              Wrap(
+                spacing: 8.0,
+                children: parentingStyleOptions.map((option) {
+                  return _buildSelectableContainer(
+                      option, selectedParentingStyles);
                 }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedparentingStyle = newValue!;
-                  });
-                },
               ),
+
               Text(
                 'Select Special Situation',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              DropdownButton<String>(
-                value: selectedSpecialSituation,
-                items: specialSituationOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
+              Wrap(
+                spacing: 8.0,
+                children: specialSituationOptions.map((option) {
+                  return _buildSelectableContainer(
+                      option, selectedSpecialSituations);
                 }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSpecialSituation = newValue!;
-                  });
-                },
               ),
+
               Text(
                 'Select Interest',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              DropdownButton<String>(
-                value: selectedInterest,
-                items: interestOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
+              Wrap(
+                spacing: 8.0,
+                children: interestOptions.map((option) {
+                  return _buildSelectableContainer(option, selectedInterests);
                 }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedInterest = newValue!;
-                  });
-                },
               ),
+
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -337,34 +296,34 @@ class _FilterScreenState extends State<FilterScreen> {
                                                 MaterialPageRoute(
                                                     builder: (builder) =>
                                                         OtherUserProfile(
-                                                          photo: user['photo'],
-                                                          favorite:
-                                                              user['favorite'],
-                                                          email: user['email'],
-                                                          specialSituation: user[
-                                                              'specialSituation'],
-                                                          familyType: user[
-                                                              'familyType'],
-                                                          fullName:
-                                                              user['fullName'],
-                                                          location:
-                                                              user['location'],
-                                                          dateofBirth: user[
-                                                              'dateofBirth'],
-                                                          interest:
-                                                              user['interest'],
-                                                          familyDescription: user[
-                                                              'familyDescription'],
-                                                          nutritions: user[
-                                                              'nutritions'],
-                                                          parentingStyle: user[
-                                                              'parentingStyle'],
                                                           phoneNumber: user[
                                                               'phoneNumber'],
-                                                          uuid: user['uuid'],
+                                                          parentingStyle: user[
+                                                              'parentingStyle'],
+                                                          nutritions: user[
+                                                              'nutritions'],
+                                                          interest:
+                                                              user['interest'],
+                                                          dateofBirth: user[
+                                                              'dateofBirth'],
+                                                          location:
+                                                              user['location'],
+                                                          specialSituation: user[
+                                                              'specialSituation'],
+                                                          email: user['email'],
+                                                          favorite:
+                                                              user['favorite'],
+                                                          familyType: user[
+                                                              'familyType'],
+                                                          familyDescription: user[
+                                                              'familyDescription'],
+                                                          photo: user['photo'],
+                                                          fullName:
+                                                              user['fullName'],
+                                                          uuid: user['uid'],
                                                         )));
                                           },
-                                          child: Text('View Profile'))
+                                          child: Text('View Profile')),
                                     ],
                                   ),
                                 )),
@@ -372,7 +331,8 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                     )
-                  : Text('No results found based on selected filters'),
+                  : SizedBox(
+                      height: 100), // Display empty space if no users found
             ],
           ),
         ),
@@ -380,13 +340,39 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
-  Widget _buildChip(String label) {
-    return Chip(
-      label: Text(
-        label,
-        style: TextStyle(color: Colors.teal),
+  Widget _buildSelectableContainer(
+      String option, List<String> selectedOptions) {
+    bool isSelected =
+        selectedOptions.contains(option); // Check if option is selected
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            selectedOptions.remove(option); // Deselect if already selected
+          } else {
+            selectedOptions.clear(); // Clear previous selections
+            selectedOptions.add(option); // Select the new option
+          }
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.blue : Colors.grey[300],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color:
+                    isSelected ? Colors.blue : Colors.grey!), // Optional border
+          ),
+          child: Text(
+            option,
+            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+          ),
+        ),
       ),
-      backgroundColor: Color(0xFFE3F4FF),
     );
   }
 }
