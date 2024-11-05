@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
@@ -11,6 +13,7 @@ import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -74,41 +77,46 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const SizedBox(height: 30),
-            Image.asset("assets/logo.png",
-                height: 104, width: 104, fit: BoxFit.cover),
-            Column(
+    return WillPopScope(
+        onWillPop: () async {
+          final shouldPop = await _showExitDialog(context);
+          return shouldPop ?? false;
+        },
+        child: Scaffold(
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  languageProvider.localizedStrings['language'] ??
-                      "Educating emotions with love",
-                  style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: textColor),
+                const SizedBox(height: 30),
+                Image.asset("assets/logo.png",
+                    height: 104, width: 104, fit: BoxFit.cover),
+                Column(
+                  children: [
+                    Text(
+                      languageProvider.localizedStrings['language'] ??
+                          "Educating emotions with love",
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: textColor),
+                    ),
+                  ],
                 ),
+                _buildEmailField(languageProvider),
+                _buildPasswordField(languageProvider),
+                _buildRememberMeAndForgotPassword(languageProvider),
+                isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildLoginButton(languageProvider),
+                isGoogle
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildGoogleSignInButton(),
+                _buildSignupLink(languageProvider),
+                _buildWebLink(languageProvider),
               ],
             ),
-            _buildEmailField(languageProvider),
-            _buildPasswordField(languageProvider),
-            _buildRememberMeAndForgotPassword(languageProvider),
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _buildLoginButton(languageProvider),
-            isGoogle
-                ? Center(child: CircularProgressIndicator())
-                : _buildGoogleSignInButton(),
-            _buildSignupLink(languageProvider),
-            _buildWebLink(languageProvider),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildEmailField(LanguageProvider languageProvider) {
@@ -403,5 +411,31 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       locationString = "${position.latitude}, ${position.longitude}";
     });
+  }
+
+  Future<bool?> _showExitDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Exit App'),
+        content: Text('Do you want to exit the app?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (Platform.isAndroid) {
+                SystemNavigator.pop(); // For Android
+              } else if (Platform.isIOS) {
+                exit(0); // For iOS
+              }
+            },
+            child: Text('Yes'),
+          ),
+        ],
+      ),
+    );
   }
 }
