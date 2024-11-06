@@ -105,13 +105,14 @@ class _MessagePageState extends State<MessagePage> {
                                     NetworkImage(snap['friendPhoto']),
                               ),
                               title: Text(
-                                snap['friendName'],
+                                snap['friendName'] ?? "NoVAlue",
                                 style: GoogleFonts.poppins(
                                     fontSize: 18,
                                     color: black,
                                     fontWeight: FontWeight.w600),
                               ),
-                              subtitle: Text(snap['lastMessageByCustomer'],
+                              subtitle: Text(
+                                  snap['lastMessageByCustomer'] ?? "",
                                   style: GoogleFonts.roboto(
                                       color: favouriteColor,
                                       fontSize: 14,

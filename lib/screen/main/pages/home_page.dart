@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextEditingController _emailController = TextEditingController();
   String _searchText = '';
-
+  List<dynamic> _favorites = [];
   @override
   void initState() {
     super.initState();
@@ -28,6 +28,17 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _searchText = _emailController.text;
       });
+    });
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        setState(() {
+          _favorites = doc['favorite'] ?? [];
+        });
+      }
     });
   }
 
@@ -179,43 +190,60 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       final Map<String, dynamic> data =
                           filteredDocs[index].data() as Map<String, dynamic>;
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => OtherUserProfile(
-                                        interest: data['interest'] ??
-                                            ['Others', 'Others', 'Others'],
-                                        email: data['email'] ?? "",
-                                        familyType: data['familyType'] ?? "",
-                                        favorite: data['favorite'] ?? [],
-                                        location: data['location'] ?? "",
-                                        dateofBirth: data['dateofBirth'] ?? "",
-                                        specialSituation:
-                                            data['specialSituation'] ?? "",
-                                        parentingStyle:
-                                            data['parentingStyle'] ?? "",
-                                        nutritions: data['nutritions'] ?? "",
-                                        phoneNumber: data['phoneNumber'] ?? "",
-                                        uuid: data['uuid'] ?? "",
-                                        fullName: data['fullName'] ?? "",
-                                        photo: data['photo'] ?? "",
-                                        familyDescription:
-                                            data['familyDescription'] ?? "",
-                                      )));
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            color: Color(0xffFFCAF4),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Stack(
-                                children: [
-                                  Container(
+                      String userUid = data['uuid'];
+                      bool isFavorite = _favorites.contains(userUid);
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          color: Color(0xffFFCAF4),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                OtherUserProfile(
+                                                  interest: data['interest'] ??
+                                                      [
+                                                        'Others',
+                                                        'Others',
+                                                        'Others'
+                                                      ],
+                                                  email: data['email'] ?? "",
+                                                  familyType:
+                                                      data['familyType'] ?? "",
+                                                  favorite:
+                                                      data['favorite'] ?? [],
+                                                  location:
+                                                      data['location'] ?? "",
+                                                  dateofBirth:
+                                                      data['dateofBirth'] ?? "",
+                                                  specialSituation: data[
+                                                          'specialSituation'] ??
+                                                      "",
+                                                  parentingStyle:
+                                                      data['parentingStyle'] ??
+                                                          "",
+                                                  nutritions:
+                                                      data['nutritions'] ?? "",
+                                                  phoneNumber:
+                                                      data['phoneNumber'] ?? "",
+                                                  uuid: data['uuid'] ?? "",
+                                                  fullName:
+                                                      data['fullName'] ?? "",
+                                                  photo: data['photo'] ?? "",
+                                                  familyDescription: data[
+                                                          'familyDescription'] ??
+                                                      "",
+                                                )));
+                                  },
+                                  child: Container(
                                     height: 120,
                                     width: MediaQuery.of(context).size.width,
                                     child: ClipRRect(
@@ -228,35 +256,49 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child:
-                                        Icon(Icons.favorite, color: Colors.red),
-                                  ),
-                                  Positioned(
-                                    bottom: 8,
-                                    right: 8,
-                                    child: Image.asset(
-                                      'assets/v.png',
-                                      height: 30,
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      // Toggle favorite status
+                                      setState(() {
+                                        if (isFavorite) {
+                                          _favorites.remove(userUid);
+                                        } else {
+                                          _favorites.add(userUid);
+                                        }
+                                      });
+                                      // Update the favorites list in the current user's document
+                                      await FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .update({'favorite': _favorites});
+                                    },
+                                    child: Icon(
+                                      Icons.favorite,
+                                      color: isFavorite
+                                          ? Colors.red
+                                          : Colors.white,
                                     ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Icon(Icons.more_horiz),
-                              SizedBox(height: 4),
-                              Text(
-                                data['fullName'],
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
                                 ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Icon(Icons.more_horiz),
+                            SizedBox(height: 4),
+                            Text(
+                              data['fullName'],
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     },
