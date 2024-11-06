@@ -2,6 +2,7 @@ import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LegalTermsScreen extends StatefulWidget {
   @override
@@ -11,31 +12,76 @@ class LegalTermsScreen extends StatefulWidget {
 class _LegalTermsScreenState extends State<LegalTermsScreen> {
   bool isAccepted = false;
 
-  void _handleAccept() {
+  @override
+  void initState() {
+    super.initState();
+    _checkAcceptance();
+  }
+
+  // Check if terms are accepted when the screen loads
+  Future<void> _checkAcceptance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? accepted = prefs.getBool('termsAccepted');
+    if (accepted != null && accepted) {
+      // If terms are accepted, allow access
+      setState(() {
+        isAccepted = true;
+      });
+    } else {
+      // Otherwise, force the user to accept
+      setState(() {
+        isAccepted = false;
+      });
+    }
+  }
+
+  // Handle acceptance of terms
+  Future<void> _handleAccept() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('termsAccepted', true); // Store acceptance
     setState(() {
       isAccepted = true;
     });
-    // Perform action when terms are accepted
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('You have accepted the terms.')),
     );
   }
 
-  void _handleDeny() {
+  // Handle denial of terms
+  Future<void> _handleDeny() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('termsAccepted', false); // Store denial
     setState(() {
       isAccepted = false;
     });
-    // Perform action when terms are denied
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('You have denied the terms.')),
+      SnackBar(content: Text('You have denied the terms. Logging out...')),
     );
+
+    // Perform logout action (for example, Firebase auth logout)
+    // FirebaseAuth.instance.signOut();
   }
 
   @override
   Widget build(BuildContext context) {
-    final languageProvider = Provider.of<LanguageProvider>(context); // Access
-
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final size = MediaQuery.of(context).size;
+
+    if (!isAccepted) {
+      // If terms are not accepted, prevent the user from interacting further
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(languageProvider.localizedStrings['Legal Terms'] ??
+              'Legal Terms'),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -51,14 +97,7 @@ class _LegalTermsScreenState extends State<LegalTermsScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  // Legal terms text
-                  '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-                  These are the legal terms that you must accept or deny before using our messaging application. Please read carefully, as acceptance implies that you agree to abide by these terms.
-                  
-                  Note: These terms are subject to change, and it is your responsibility to keep updated. Any modifications will be communicated through our application.''',
+                  '''Lorem ipsum dolor sit amet, consectetur adipiscing elit...''', // Your legal terms
                   style: TextStyle(fontSize: 16),
                 ),
               ),
@@ -67,7 +106,7 @@ class _LegalTermsScreenState extends State<LegalTermsScreen> {
             Text(
               'Do you accept the terms?',
               style: TextStyle(
-                fontSize: size.width * 0.045, // Responsive text size
+                fontSize: size.width * 0.045,
                 fontWeight: FontWeight.bold,
               ),
             ),
