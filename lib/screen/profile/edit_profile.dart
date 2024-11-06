@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
+import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/delete_widget.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -193,53 +194,6 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   // Function to show the multi-select dialog
-  void _showInterestMultiSelect() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('Select Interests (Max 3)'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: availableInterests.map((String interest) {
-                    return CheckboxListTile(
-                      title: Text(interest),
-                      value: selectedInterests.contains(interest),
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            // Check if the selection limit (3) is reached
-                            if (selectedInterests.length < 3) {
-                              selectedInterests.add(interest);
-                            } else {
-                              selectedInterests[selectedInterests.length - 1] =
-                                  interest;
-                            }
-                          } else {
-                            selectedInterests.remove(interest);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Done'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,11 +274,32 @@ class _EditProfileState extends State<EditProfile> {
                                   ))
                               .toList(),
                         ),
-                        ElevatedButton(
-                          onPressed: _showInterestMultiSelect,
-                          child: Text(languageProvider
-                                  .localizedStrings['Select Interests'] ??
-                              'Select Interests'),
+                        Wrap(
+                          spacing: 8,
+                          children: availableInterests.map((interest) {
+                            final isSelected =
+                                selectedInterests.contains(interest);
+                            return ChoiceChip(
+                              label: Text(interest),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  if (selected) {
+                                    if (selectedInterests.length < 3) {
+                                      selectedInterests.add(interest);
+                                    }
+                                  } else {
+                                    selectedInterests.remove(interest);
+                                  }
+                                });
+                              },
+                              selectedColor: firstMainColor,
+                              backgroundColor: Colors.grey.shade200,
+                              labelStyle: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black),
+                            );
+                          }).toList(),
                         ),
                       ],
                     ),

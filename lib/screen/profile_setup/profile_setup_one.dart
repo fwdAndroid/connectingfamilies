@@ -157,10 +157,11 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                         ? othersController.text
                         : selectedSpecialSituation;
 
-                    String address = countryValue ??
-                        "" + stateValue ??
-                        "" + cityValue ??
-                        "" + locationController.text;
+                    String address = countryValue +
+                            stateValue +
+                            cityValue +
+                            locationController.text ??
+                        "No Location";
 
                     Navigator.push(
                       context,
