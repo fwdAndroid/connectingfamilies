@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatMessages extends StatefulWidget {
   final userId;
@@ -30,6 +37,14 @@ class _ChatMessagesState extends State<ChatMessages> {
   String groupChatId = "";
   ScrollController scrollController = ScrollController();
   TextEditingController messageController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  File? imageUrl;
+  UploadTask? task;
+  File? file;
+
+  String? imageLink, fileLink;
+  firebase_storage.UploadTask? uploadTask;
   @override
   void initState() {
     // TODO: implement initState
@@ -189,7 +204,82 @@ class _ChatMessagesState extends State<ChatMessages> {
                                         ),
                                       ),
                                     )
-                                  : Container();
+                                  : ds.get("type") == 1
+                                      ? Stack(
+                                          children: [
+                                            Column(children: [
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Align(
+                                                  alignment: (ds.get(
+                                                              "senderId") ==
+                                                          FirebaseAuth.instance
+                                                              .currentUser!.uid
+                                                      ? Alignment.bottomRight
+                                                      : Alignment.bottomLeft),
+                                                  child: Container(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.3,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.4,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+
+                                                      // color: (ds.get("senderId") == FirebaseAuth.instance.currentUser!.uid?Colors.grey.shade100:Colors.blue[100]),
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          height: 140,
+                                                          imageUrl:
+                                                              ds.get("image"),
+                                                          placeholder: (context,
+                                                                  url) =>
+                                                              new CircularProgressIndicator(),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              new Icon(
+                                                                  Icons.error),
+                                                        ),
+                                                        Text(
+                                                          DateFormat.jm().format(
+                                                              DateTime.fromMillisecondsSinceEpoch(
+                                                                  int.parse(ds.get(
+                                                                      "time")))),
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 12,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    // padding: EdgeInsets.all(16),
+                                                  ),
+                                                ),
+                                              ),
+                                              task != null
+                                                  ? buildUploadStatus(task!)
+                                                  : Container(),
+                                            ]),
+                                          ],
+                                        )
+                                      : Container();
                             },
                           ),
                         );
@@ -207,6 +297,46 @@ class _ChatMessagesState extends State<ChatMessages> {
               color: Colors.white,
               child: Row(
                 children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        builder: (BuildContext context) => SafeArea(
+                          child: SizedBox(
+                            height: 144,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    addImage();
+                                  },
+                                  child: const Align(
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Text('Photo'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        color: btnColor,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: TextField(
                         controller: messageController,
@@ -314,5 +444,77 @@ class _ChatMessagesState extends State<ChatMessages> {
     } else {
       print("Document does not exist, cannot update last message by provider");
     }
+  }
+
+  Widget buildUploadStatus(UploadTask task) => StreamBuilder<TaskSnapshot>(
+        stream: task.snapshotEvents,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final snap = snapshot.data!;
+            final progress = snap.bytesTransferred / snap.totalBytes;
+            final percentage = (progress * 100).toStringAsFixed(2);
+
+            return Text(
+              '$percentage %',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
+      );
+
+  Future uploadImageToFirebase() async {
+    File? fileName = imageUrl;
+    var uuid = Uuid();
+    firebase_storage.Reference firebaseStorageRef =
+        firebase_storage.FirebaseStorage.instance.ref().child(
+            'messages/${FirebaseAuth.instance.currentUser!.uid}/images+${uuid.v4()}');
+    firebase_storage.UploadTask uploadTask =
+        firebaseStorageRef.putFile(fileName!);
+    firebase_storage.TaskSnapshot ed = await uploadTask.whenComplete(() async {
+      print(fileName);
+      String img = await uploadTask.snapshot.ref.getDownloadURL();
+      setState(() {
+        imageLink = img;
+      });
+    });
+  }
+
+  void addImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      imageUrl = File(image!.path);
+    });
+    await uploadImageToFirebase().then((value) {
+      var documentReference = FirebaseFirestore.instance
+          .collection('messages')
+          .doc(groupChatId)
+          .collection(groupChatId)
+          .doc(DateTime.now().millisecondsSinceEpoch.toString());
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          documentReference,
+          {
+            "senderId": FirebaseAuth.instance.currentUser!.uid,
+            "receiverId": widget.friendId,
+            // "content": messageController.text,
+            "time": DateTime.now().millisecondsSinceEpoch.toString(),
+            'image': imageLink,
+            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+            // 'content': content,
+            "file": "",
+            'type': 1,
+          },
+        );
+      });
+    }).then((value) {
+      // FocusScope.of(context).unfocus();
+      messageController.clear();
+    });
   }
 }

@@ -31,99 +31,100 @@ class _MessagePageState extends State<MessagePage> {
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("chats")
-                .where("userId", isEqualTo: currentUserId)
-                .snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+          stream: _getChatStreams(currentUserId),
+          builder:
+              (context, AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              return StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection("chats")
-                      .where("friendId", isEqualTo: currentUserId)
-                      .snapshots(),
-                  builder:
-                      (context, AsyncSnapshot<QuerySnapshot> friendSnapshot) {
-                    if (friendSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var snap =
+                      snapshot.data![index].data() as Map<String, dynamic>;
+                  return _buildChatTile(
+                      context, snap, currentUserId, languageProvider);
+                },
+              );
+            } else {
+              return Center(
+                child: Text(
+                    languageProvider.localizedStrings['No chats found'] ??
+                        'No chats found'),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
 
-                    // Combine the results from both queries
-                    var userDocs = userSnapshot.data?.docs ?? [];
-                    var friendDocs = friendSnapshot.data?.docs ?? [];
+  /// Combine user and friend chat streams and remove duplicates based on chatId
+  Stream<List<QueryDocumentSnapshot>> _getChatStreams(String? currentUserId) {
+    final userChats = FirebaseFirestore.instance
+        .collection("chats")
+        .where("userId", isEqualTo: currentUserId)
+        .snapshots();
+    final friendChats = FirebaseFirestore.instance
+        .collection("chats")
+        .where("friendId", isEqualTo: currentUserId)
+        .snapshots();
 
-                    // Merge the lists and remove duplicates based on chatId
-                    var allDocs = [
-                      ...userDocs,
-                      ...friendDocs.where((friendDoc) => !userDocs
-                          .any((userDoc) => userDoc.id == friendDoc.id))
-                    ];
+    return userChats.asyncMap((userSnapshot) async {
+      final friendSnapshot = await friendChats.first;
+      final userDocs = userSnapshot.docs;
+      final friendDocs = friendSnapshot.docs
+          .where((doc) => !userDocs.any((userDoc) => userDoc.id == doc.id));
+      return [...userDocs, ...friendDocs];
+    });
+  }
 
-                    if (allDocs.isEmpty) {
-                      return Center(
-                          child: Text(languageProvider
-                                  .localizedStrings['No chats found'] ??
-                              'No chats found'));
-                    }
-
-                    return ListView.builder(
-                      itemCount: allDocs.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var snap =
-                            allDocs[index].data() as Map<String, dynamic>;
-
-                        return Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Card(
-                            elevation: 1,
-                            color: colorWhite,
-                            child: ListTile(
-                              trailing: Text("11:30",
-                                  style: GoogleFonts.roboto(
-                                      color: black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500)),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) => ChatMessages(
-                                            friendId: snap['friendId'],
-                                            friendName: snap['friendName'],
-                                            friendPhoto: snap['friendPhoto'],
-                                            userId: currentUserId,
-                                            chatUUid: snap['chatId'],
-                                            userName: snap['userName'],
-                                            userPhoto: snap['userPhoto'])));
-                              },
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(snap['friendPhoto']),
-                              ),
-                              title: Text(
-                                snap['friendName'] ?? "NoVAlue",
-                                style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    color: black,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              subtitle: Text(
-                                  snap['lastMessageByCustomer'] ?? "",
-                                  style: GoogleFonts.roboto(
-                                      color: favouriteColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500)),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  });
-            }),
+  /// Builds the chat tile widget
+  Widget _buildChatTile(BuildContext context, Map<String, dynamic> snap,
+      String? currentUserId, LanguageProvider languageProvider) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        elevation: 1,
+        color: colorWhite,
+        child: ListTile(
+          trailing: Text("11:30", // Ideally, this should come from `snap` data
+              style: GoogleFonts.roboto(
+                  color: black, fontSize: 14, fontWeight: FontWeight.w500)),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (builder) => ChatMessages(
+                  friendId: snap['friendId'],
+                  friendName: snap['friendName'],
+                  friendPhoto: snap['friendPhoto'],
+                  userId: currentUserId,
+                  chatUUid: snap['chatId'],
+                  userName: snap['userName'],
+                  userPhoto: snap['userPhoto'],
+                ),
+              ),
+            );
+          },
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(snap['friendPhoto'] ?? ''),
+          ),
+          title: Text(
+            snap['friendName'] ?? "No Name",
+            style: GoogleFonts.poppins(
+                fontSize: 18, color: black, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            snap['lastMessageByCustomer'] ?? "",
+            style: GoogleFonts.roboto(
+                color: favouriteColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500),
+          ),
+        ),
       ),
     );
   }
