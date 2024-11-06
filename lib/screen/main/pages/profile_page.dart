@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../provider/language_provider.dart';
 
@@ -26,6 +27,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final String whatsappCatalogUrl = "https://wa.me/c/34644242148";
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
@@ -279,14 +282,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 40,
               ),
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (builder) => Webpage(
-                              title: "",
-                              url:
-                                  "https://mamadepluton.com/mamadepluton/?taxonomy=nav_menu&term=menu-secundario",
-                            )));
+                _openWhatsAppCatalog();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (builder) => Webpage(
+                //               title: "",
+                //               url: "https://wa.me/c/34644242148",
+                //             )));
               },
               trailing: Icon(
                 Icons.keyboard_arrow_right,
@@ -360,5 +363,14 @@ class _ProfilePageState extends State<ProfilePage> {
       'Join our app using my invite link: $inviteLink',
       subject: 'Join us on the app!',
     );
+  }
+
+  void _openWhatsAppCatalog() async {
+    final Uri url = Uri.parse(whatsappCatalogUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
