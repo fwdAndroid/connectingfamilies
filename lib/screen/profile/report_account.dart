@@ -129,7 +129,25 @@ class _ReportAccountState extends State<ReportAccount> {
                     setState(() {
                       isloading = false;
                     });
-                    showMessageBar("Report is Send", context);
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Complaint Sent"),
+                          content: Text("Your complaint has been sent."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Close dialog
+                                Navigator.pop(
+                                    context); // Return to the previous screen
+                              },
+                              child: Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
                 },
                 title: languageProvider.localizedStrings['Send Report'] ??

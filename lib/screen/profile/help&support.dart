@@ -23,9 +23,10 @@ class _HelpSupportState extends State<HelpSupport> {
   TextEditingController _messageController = TextEditingController();
   Uint8List? image;
   bool isloading = false;
+
   @override
   Widget build(BuildContext context) {
-    final languageProvider = Provider.of<LanguageProvider>(context); // Access
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final size = MediaQuery.of(context).size;
     var uuid = Uuid().v4();
 
@@ -52,12 +53,11 @@ class _HelpSupportState extends State<HelpSupport> {
               languageProvider.localizedStrings['Report technical issues'] ??
                   'Report technical issues',
               style: TextStyle(
-                fontSize: size.width * 0.045, // Responsive text size
+                fontSize: size.width * 0.045,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 16),
-            // TextField for message input
             TextField(
               controller: _messageController,
               maxLines: 6,
@@ -69,15 +69,18 @@ class _HelpSupportState extends State<HelpSupport> {
               ),
             ),
             SizedBox(height: 16),
-            // Button for adding a screenshot
             image != null
                 ? Center(
                     child: GestureDetector(
-                        onTap: () {
-                          selectImage();
-                        },
-                        child: CircleAvatar(
-                            radius: 59, backgroundImage: MemoryImage(image!))))
+                      onTap: () {
+                        selectImage();
+                      },
+                      child: CircleAvatar(
+                        radius: 59,
+                        backgroundImage: MemoryImage(image!),
+                      ),
+                    ),
+                  )
                 : ElevatedButton.icon(
                     onPressed: () {
                       selectImage();
@@ -93,38 +96,59 @@ class _HelpSupportState extends State<HelpSupport> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      minimumSize: Size(double.infinity,
-                          size.height * 0.06), // Responsive button size
+                      minimumSize: Size(double.infinity, size.height * 0.06),
                     ),
                   ),
-            Spacer(), // Push the send button to the bottom
-            // Send button
+            Spacer(),
             SizedBox(
               width: double.infinity,
-              height: size.height * 0.08, // Responsive button height
+              height: size.height * 0.08,
               child: SaveButton(
                 onTap: () async {
-                  // Handle sending message
                   if (_messageController.text.isEmpty) {
                     showMessageBar("Text is Required", context);
                   } else {
                     setState(() {
                       isloading = true;
                     });
-                    String photo = await StorageMethods()
-                        .uploadImageToStorage("childName", image!);
-                    FirebaseFirestore.instance
+
+                    String photo = image != null
+                        ? await StorageMethods()
+                            .uploadImageToStorage("childName", image!)
+                        : "";
+
+                    await FirebaseFirestore.instance
                         .collection("help")
                         .doc(uuid)
                         .set({
                       "uuid": uuid,
                       "message": _messageController.text,
-                      "image": photo ?? "",
+                      "image": photo,
                     });
+
                     setState(() {
                       isloading = false;
                     });
-                    showMessageBar("Report is Send", context);
+
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Complaint Sent"),
+                          content: Text("Your query has been sent."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Close dialog
+                                Navigator.pop(
+                                    context); // Return to the previous screen
+                              },
+                              child: Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
                 },
                 title: languageProvider.localizedStrings['Send'] ?? "Send",

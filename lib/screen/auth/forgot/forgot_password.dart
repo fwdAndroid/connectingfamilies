@@ -34,7 +34,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
       // Show confirmation and navigate to the login screen
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password reset email sent!')),
+        SnackBar(
+            content: Text(
+                'Password reset email sent! Please check your email, including the spam folder, for any response')),
       );
 
       // Navigate to the login screen after a successful password reset email
