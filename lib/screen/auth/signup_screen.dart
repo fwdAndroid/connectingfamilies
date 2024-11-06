@@ -33,11 +33,20 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool passwordVisible = false;
   bool isLoading = false;
+  bool passwordConfrimVisible = false;
 
-  @override
-  void initState() {
-    super.initState();
-    passwordVisible = true;
+  //Password Toggle Function
+  void toggleShowPassword() {
+    setState(() {
+      passwordVisible = !passwordVisible; // Toggle the showPassword flag
+    });
+  }
+
+  void toggleShowPasswordConfrim() {
+    setState(() {
+      passwordConfrimVisible =
+          !passwordConfrimVisible; // Toggle the showPassword flag
+    });
   }
 
   Uint8List? image;
@@ -200,10 +209,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     padding: const EdgeInsets.all(8),
                     child: TextFormField(
                       validator: RegisterFunctions().validatePassword,
-                      obscureText: passwordVisible,
+                      obscureText: !passwordVisible,
                       controller: _passwordController,
                       style: GoogleFonts.poppins(color: black),
                       decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: toggleShowPassword,
+                            icon: passwordVisible
+                                ? Icon(Icons.visibility_off, color: iconColor)
+                                : Icon(Icons.visibility, color: iconColor),
+                          ),
                           prefixIcon: Icon(
                             Icons.lock,
                             color: iconColor,
@@ -247,10 +262,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     padding: const EdgeInsets.all(8),
                     child: TextFormField(
                       validator: _validateConfirmPassword,
-                      obscureText: passwordVisible,
+                      obscureText: !passwordConfrimVisible,
                       controller: _reenterController,
                       style: GoogleFonts.poppins(color: black),
                       decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: toggleShowPasswordConfrim,
+                            icon: passwordConfrimVisible
+                                ? Icon(Icons.visibility_off, color: iconColor)
+                                : Icon(Icons.visibility, color: iconColor),
+                          ),
                           prefixIcon: Icon(
                             Icons.lock,
                             color: iconColor,
@@ -366,12 +387,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             languageProvider.localizedStrings[
                                     'Confirm Password is Required'] ??
                                 "Confirm Password is Required",
-                            context);
-                      } else if (phoneController.text.isEmpty) {
-                        showMessageBar(
-                            languageProvider.localizedStrings[
-                                    'Contact Number is Required'] ??
-                                "Contact Number is Required ",
                             context);
                       } else {
                         setState(() {

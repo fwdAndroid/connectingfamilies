@@ -1,13 +1,11 @@
 import 'dart:typed_data';
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_two.dart';
-import 'package:connectingfamilies/service/location_service.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
-import 'package:intl/intl.dart';
 
 class ProfileSetupOne extends StatefulWidget {
   final Uint8List image;
@@ -33,9 +31,9 @@ class ProfileSetupOne extends StatefulWidget {
 
 class _ProfileSetupOneState extends State<ProfileSetupOne> {
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
   final TextEditingController othersController = TextEditingController();
-  final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
   String dropdownValue = 'Woman';
   bool showSpecialSituations = false;
   bool showOthersField = false;
@@ -45,18 +43,26 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   final TextEditingController newMemberNameController = TextEditingController();
   final TextEditingController newMemberAgeController = TextEditingController();
 
-  final LocationService _locationService = LocationService();
-
   // Manage members data
   List<Member> members = [];
-
   final List<String> items = ['Woman', 'Man', 'Boy', 'Girl'];
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchLocationAndAddress();
-  }
+  // Special situations options list
+  List<String> specialSituations = [
+    "Wheel chair",
+    "Rare Disease",
+    "Mobility Problems",
+    "Autism",
+    "TDAH",
+    "High Capacities",
+    "Vision Problems",
+    "Others",
+    "Asperger",
+  ];
+
+  String countryValue = "";
+  String stateValue = "";
+  String cityValue = "";
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +72,77 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              buildDescriptionSection(),
-              buildLocationSection(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Family Description",
+                        style: GoogleFonts.poppins(
+                            color: black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      ),
+                    ),
+                    TextFormField(
+                      maxLines: 5,
+                      controller: descriptionController,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        hintText:
+                            "Enter a brief description of your family and what you're looking for",
+                        hintStyle:
+                            GoogleFonts.poppins(color: black, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Location",
+                        style: GoogleFonts.poppins(
+                            color: black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      ),
+                    ),
+                    SelectState(
+                      onCountryChanged: (value) {
+                        setState(() {
+                          countryValue = value;
+                        });
+                      },
+                      onStateChanged: (value) {
+                        setState(() {
+                          stateValue = value;
+                        });
+                      },
+                      onCityChanged: (value) {
+                        setState(() {
+                          cityValue = value;
+                        });
+                      },
+                    ),
+                    TextFormField(
+                      controller: locationController,
+                      decoration: InputDecoration(
+                        hintText: 'Address',
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               buildFamilyTypeSection(),
               if (showSpecialSituations) buildSpecialSituationsSection(),
               if (showOthersField) buildOthersField(),
@@ -81,12 +156,18 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                     String finalSpecialSituation = showOthersField
                         ? othersController.text
                         : selectedSpecialSituation;
+
+                    String address = countryValue ??
+                        "" + stateValue ??
+                        "" + cityValue ??
+                        "" + locationController.text;
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (builder) => ProfileSetupTwo(
                           email: widget.email,
-                          location: locationController.text.trim(),
+                          location: address,
                           password: widget.password,
                           phoneNumber: widget.phoneNumber,
                           specialSituation: finalSpecialSituation,
@@ -94,7 +175,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                           familyDescription: descriptionController.text.trim(),
                           confirmPassword: widget.confirmPassword,
                           fullName: widget.fullName,
-                          dob: dateOfBirthController.text.trim(),
+                          dob: newMemberAgeController.text.trim(),
                           familyType: dropdownValue,
                         ),
                       ),
@@ -109,72 +190,39 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     );
   }
 
-  Widget buildDescriptionSection() {
-    return buildSectionWithTextField(
-      title: 'Family description*',
-      hint:
-          "Enter a brief description of your family and what you're looking for",
-      controller: descriptionController,
-      maxLines: 5,
-    );
-  }
-
-  Widget buildLocationSection() {
-    return buildSectionWithTextField(
-      title: 'Location*',
-      hint: 'Enter Your Address',
-      controller: locationController,
-    );
-  }
-
   Widget buildFamilyTypeSection() {
-    return Column(
-      children: [
-        buildSectionTitle('Family Type*'),
-        Row(
-          children: [
-            Expanded(
-              child: DropdownButton<String>(
-                isExpanded: true,
-                value: dropdownValue,
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: items.map((String item) {
-                  return DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownValue = newValue!;
-                    showSpecialSituations =
-                        ['Man', 'Woman', 'Boy', 'Girl'].contains(newValue);
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextFormField(
-                controller: dateOfBirthController,
-                readOnly: true,
-                onTap: _pickDate,
-                style: GoogleFonts.poppins(color: black),
-                decoration: InputDecoration(
-                  hintText: "Date of Birth",
-                  hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildSectionTitle('Family Type*'),
+          DropdownButton<String>(
+            isExpanded: true,
+            value: dropdownValue,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+                showSpecialSituations =
+                    ['Man', 'Woman', 'Boy', 'Girl'].contains(newValue);
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget buildSpecialSituationsSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildSectionTitle('Special Situations*'),
         GroupButton(
@@ -199,27 +247,40 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
             });
           },
           isRadio: true,
-          buttons: [
-            "Wheel chair",
-            "Rare Disease",
-            "Mobility Problems",
-            "Autism",
-            "TDAH",
-            "High Capacities",
-            "Vision Problems",
-            "Others",
-            "Asperger",
-          ],
+          buttons: specialSituations,
         ),
       ],
     );
   }
 
   Widget buildOthersField() {
-    return buildSectionWithTextField(
-      title: 'Please specify*',
-      hint: 'Specify the situation',
-      controller: othersController,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Please specify*',
+            style: GoogleFonts.poppins(
+                color: black, fontWeight: FontWeight.w500, fontSize: 14),
+          ),
+          TextFormField(
+            controller: othersController,
+            decoration: InputDecoration(
+              hintText: 'Specify the situation',
+              border: const OutlineInputBorder(),
+            ),
+            onFieldSubmitted: (value) {
+              setState(() {
+                specialSituations.insert(specialSituations.length - 1, value);
+                selectedSpecialSituation = value;
+                showOthersField = false;
+                othersController.clear();
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -231,6 +292,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
           children: [
             Expanded(
               child: TextFormField(
+                maxLength: 20,
                 controller: newMemberNameController,
                 decoration: InputDecoration(
                   hintText: 'Member Name',
@@ -241,6 +303,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
             const SizedBox(width: 10),
             Expanded(
               child: TextFormField(
+                maxLength: 2,
                 controller: newMemberAgeController,
                 decoration: InputDecoration(
                   hintText: 'Age',
@@ -332,80 +395,26 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     );
   }
 
-  Future<void> _fetchLocationAndAddress() async {
-    try {
-      Position position = await _locationService.getCurrentLocation();
-      String address =
-          await _locationService.getAddressFromCoordinates(position);
-      setState(() {
-        locationController.text = address;
-      });
-    } catch (e) {
-      print('Error fetching location: $e');
-    }
-  }
-
-  Future<void> _pickDate() async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        dateOfBirthController.text =
-            DateFormat('yyyy-MM-dd').format(pickedDate);
-      });
-    }
-  }
-
-  Widget buildSectionWithTextField({
-    required String title,
-    required String hint,
-    required TextEditingController controller,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            title,
-            style: GoogleFonts.poppins(color: black, fontSize: 12),
-          ),
-        ),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: GoogleFonts.poppins(color: black, fontSize: 12),
-            border: const OutlineInputBorder(),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         title,
-        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 12),
+        style: GoogleFonts.poppins(
+            color: black, fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
   }
 }
 
 class Member {
-  String name;
-  String age;
-  String specialSituation;
+  final String name;
+  final String age;
+  final String specialSituation;
 
-  Member(
-      {required this.name, required this.age, required this.specialSituation});
+  Member({
+    required this.name,
+    required this.age,
+    required this.specialSituation,
+  });
 }

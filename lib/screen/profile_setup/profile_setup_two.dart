@@ -48,6 +48,28 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
   String selectedNutritionSituation = '';
   String selectedParentingSituation = '';
 
+  List<String> nutritionsList = [
+    "No Preference",
+    "Ultra-Processed Foods Free",
+    "Vegan",
+    "Vegetarian",
+    "Gluten Free",
+    "Sugar Free",
+    "Pork free",
+    "Others",
+  ];
+
+  List<String> parentingList = [
+    "Avoid using electronic devices",
+    "Free use of electronic devices",
+    "Moderate use of electronic devices",
+    "Respectful Parenting",
+    "A Slap in Time",
+    "Never Slap in Time",
+    "My children have Phone",
+    "Others",
+  ];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -74,40 +96,31 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                 Container(
                   margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
                   child: GroupButton(
-                    options: GroupButtonOptions(
-                      buttonWidth: 150,
-                      unselectedTextStyle:
-                          GoogleFonts.poppins(color: black, fontSize: 11),
-                      selectedTextStyle:
-                          GoogleFonts.poppins(color: colorWhite, fontSize: 11),
-                      textAlign: TextAlign.center,
-                      selectedBorderColor: firstMainColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onSelected: (value, index, isSelected) {
-                      setState(() {
-                        if (value == "Others") {
-                          showOthersField = true;
-                          selectedParentingSituation = '';
-                        } else {
-                          showOthersField = false;
-                          selectedParentingSituation = value.toString();
-                        }
-                      });
-                    },
-                    isRadio: true,
-                    buttons: [
-                      "Avoid using electronic devices",
-                      "Free use of electronic devices",
-                      "Moderate use of electronic devices",
-                      "Respectful Parenting",
-                      "A Slap in Time",
-                      "Never Slap in Time",
-                      "My children have Phone",
-                      "Others",
-                    ],
-                  ),
+                      options: GroupButtonOptions(
+                        buttonWidth: 150,
+                        unselectedTextStyle:
+                            GoogleFonts.poppins(color: black, fontSize: 11),
+                        selectedTextStyle: GoogleFonts.poppins(
+                            color: colorWhite, fontSize: 11),
+                        textAlign: TextAlign.center,
+                        selectedBorderColor: firstMainColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      onSelected: (value, index, isSelected) {
+                        setState(() {
+                          if (value == "Others") {
+                            showOthersField = true;
+                            selectedParentingSituation = '';
+                          } else {
+                            showOthersField = false;
+                            selectedParentingSituation = value.toString();
+                          }
+                        });
+                      },
+                      isRadio: true,
+                      buttons: parentingList),
                 ),
+                if (showOthersField) buildOthersField(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -145,39 +158,29 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                 Container(
                   margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
                   child: GroupButton(
-                    options: GroupButtonOptions(
-                      buttonWidth: 100,
-                      unselectedTextStyle:
-                          GoogleFonts.poppins(color: black, fontSize: 10),
-                      selectedTextStyle:
-                          GoogleFonts.poppins(color: colorWhite, fontSize: 10),
-                      textAlign: TextAlign.center,
-                      selectedBorderColor: firstMainColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onSelected: (value, index, isSelected) {
-                      setState(() {
-                        if (value == "Others") {
-                          showOthersFieldNu = true;
-                          selectedNutritionSituation = '';
-                        } else {
-                          showOthersFieldNu = false;
-                          selectedNutritionSituation = value.toString();
-                        }
-                      });
-                    },
-                    isRadio: true,
-                    buttons: [
-                      "No Preference",
-                      "Ultra-Processed Foods Free",
-                      "Vegan",
-                      "Vegetarian",
-                      "Gluten Free",
-                      "Sugar Free",
-                      "Pork free",
-                      "Others",
-                    ],
-                  ),
+                      options: GroupButtonOptions(
+                        buttonWidth: 100,
+                        unselectedTextStyle:
+                            GoogleFonts.poppins(color: black, fontSize: 10),
+                        selectedTextStyle: GoogleFonts.poppins(
+                            color: colorWhite, fontSize: 10),
+                        textAlign: TextAlign.center,
+                        selectedBorderColor: firstMainColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      onSelected: (value, index, isSelected) {
+                        setState(() {
+                          if (value == "Others") {
+                            showOthersFieldNu = true;
+                            selectedNutritionSituation = '';
+                          } else {
+                            showOthersFieldNu = false;
+                            selectedNutritionSituation = value.toString();
+                          }
+                        });
+                      },
+                      isRadio: true,
+                      buttons: nutritionsList),
                 ),
                 if (showOthersFieldNu) buildOthersFieldN(),
                 Padding(
@@ -257,6 +260,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
           margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
           padding: const EdgeInsets.all(8),
           child: TextFormField(
+            onFieldSubmitted: (value) {
+              setState(() {
+                parentingList.insert(parentingList.length - 1, value);
+                selectedParentingSituation = value;
+                showOthersField = false;
+                _controller.clear();
+              });
+            },
             controller: _controller,
             style: GoogleFonts.poppins(color: black),
             decoration: InputDecoration(
@@ -305,6 +316,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
           margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
           padding: const EdgeInsets.all(8),
           child: TextFormField(
+            onFieldSubmitted: (value) {
+              setState(() {
+                nutritionsList.insert(nutritionsList.length - 1, value);
+                selectedNutritionSituation = value;
+                showOthersFieldNu = false;
+                _nuController.clear();
+              });
+            },
             controller: _nuController,
             style: GoogleFonts.poppins(color: black),
             decoration: InputDecoration(

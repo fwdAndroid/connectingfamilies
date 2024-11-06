@@ -7,14 +7,12 @@ import 'package:connectingfamilies/screen/auth/signup_screen.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
 import 'package:connectingfamilies/screen/main/pages/webpage.dart';
 import 'package:connectingfamilies/service/database.dart';
-import 'package:connectingfamilies/service/location_service.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
@@ -30,7 +28,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  final LocationService _locationService = LocationService();
 
   bool isChecked = false;
   bool showPassword = false;
@@ -40,7 +37,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchLocationAndAddress();
     _authCheck(); // Check if user is already logged in
   }
 
@@ -404,13 +400,6 @@ class _LoginScreenState extends State<LoginScreen> {
         )
       ],
     );
-  }
-
-  void _fetchLocationAndAddress() async {
-    Position position = await _locationService.getCurrentLocation();
-    setState(() {
-      locationString = "${position.latitude}, ${position.longitude}";
-    });
   }
 
   Future<bool?> _showExitDialog(BuildContext context) {

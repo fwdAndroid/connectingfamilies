@@ -235,6 +235,14 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
           margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
           padding: const EdgeInsets.all(8),
           child: TextFormField(
+            onFieldSubmitted: (value) {
+              setState(() {
+                activities.insert(selectedActivities.length - 1, value);
+                othersController.text = value;
+                showOthersField = false;
+                othersController.clear();
+              });
+            },
             controller: othersController,
             style: GoogleFonts.poppins(color: black),
             decoration: InputDecoration(
