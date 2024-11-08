@@ -121,23 +121,6 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                       buttons: parentingList),
                 ),
                 if (showOthersField) buildOthersField(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 130,
-                        child: SaveButton(
-                            title: "Add",
-                            onTap: () {
-                              showMessageBar(
-                                  "Values Added Successfully", context);
-                            }),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
             Column(
@@ -183,23 +166,6 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                       buttons: nutritionsList),
                 ),
                 if (showOthersFieldNu) buildOthersFieldN(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 130,
-                        child: SaveButton(
-                            title: "Add",
-                            onTap: () {
-                              showMessageBar(
-                                  "Values Added Successfully", context);
-                            }),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
             Padding(

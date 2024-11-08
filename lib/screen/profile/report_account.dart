@@ -116,38 +116,55 @@ class _ReportAccountState extends State<ReportAccount> {
                     setState(() {
                       isloading = true;
                     });
-                    String photo = await StorageMethods()
-                        .uploadImageToStorage("childName", image!);
-                    FirebaseFirestore.instance
-                        .collection("report")
-                        .doc(uuid)
-                        .set({
-                      "uuid": uuid,
-                      "message": _messageController.text,
-                      "image": photo ?? "",
-                    });
-                    setState(() {
-                      isloading = false;
-                    });
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text("Complaint Sent"),
-                          content: Text("Your complaint has been sent."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close dialog
-                                Navigator.pop(
-                                    context); // Return to the previous screen
-                              },
-                              child: Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+
+                    // Attempt to upload image only if it's selected
+                    String photo = image != null
+                        ? await StorageMethods()
+                            .uploadImageToStorage("childName", image!)
+                        : "";
+
+                    // Attempt Firestore upload
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection("report")
+                          .doc(uuid)
+                          .set({
+                        "uuid": uuid,
+                        "message": _messageController.text,
+                        "image": photo,
+                      });
+
+                      // Ensure the widget is still mounted before showing the dialog
+                      if (!mounted) return;
+
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text("Complaint Sent"),
+                            content: Text("Your complaint has been sent."),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Close dialog
+                                  Navigator.pop(
+                                      context); // Return to previous screen
+                                },
+                                child: Text("OK"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } catch (e) {
+                      showMessageBar(
+                          "Error sending complaint. Please try again.",
+                          context);
+                    } finally {
+                      setState(() {
+                        isloading = false;
+                      });
+                    }
                   }
                 },
                 title: languageProvider.localizedStrings['Send Report'] ??

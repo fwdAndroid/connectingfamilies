@@ -130,11 +130,14 @@ class _HelpSupportState extends State<HelpSupport> {
                       isloading = false;
                     });
 
+                    // Show the dialog box
+                    if (!mounted)
+                      return; // Ensure the widget is still in the tree
                     showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Complaint Sent"),
+                          title: Text("Help & Support"),
                           content: Text("Your query has been sent."),
                           actions: [
                             TextButton(
