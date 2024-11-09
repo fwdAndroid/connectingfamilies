@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:connectingfamilies/screen/profile/legal_terms.dart';
 import 'package:connectingfamilies/screen/profile_setup/app_regulation.dart';
 import 'package:connectingfamilies/service/database.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
@@ -8,6 +9,8 @@ import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
+
+import 'app_regulation.dart';
 
 class ProfileSetupThree extends StatefulWidget {
   String familyDescription;
@@ -137,23 +140,6 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                     buttons: activities,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 130,
-                        child: SaveButton(
-                            title: "Add",
-                            onTap: () {
-                              showMessageBar(
-                                  "Values Added Successfully", context);
-                            }),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
             if (showOthersField) buildOthersField(),

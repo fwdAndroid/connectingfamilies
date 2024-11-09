@@ -1,5 +1,6 @@
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,7 +62,7 @@ class _LegalTermsScreenState extends State<LegalTermsScreen> {
     );
 
     // Perform logout action (for example, Firebase auth logout)
-    // FirebaseAuth.instance.signOut();
+    FirebaseAuth.instance.signOut();
   }
 
   @override

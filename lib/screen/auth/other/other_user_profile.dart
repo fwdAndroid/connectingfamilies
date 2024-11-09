@@ -135,7 +135,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                       children: [
                         Icon(Icons.location_on, color: Colors.pink),
                         SizedBox(width: 8),
-                        Text(widget.location),
+                        Expanded(child: Text(widget.location)),
                       ],
                     ),
                     SizedBox(height: 16),

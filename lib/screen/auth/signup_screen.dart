@@ -392,14 +392,14 @@ class _SignupScreenState extends State<SignupScreen> {
                         setState(() {
                           isLoading = true;
                         });
+                        print(_phoneNumber);
                         if (_formKey.currentState?.validate() ?? false) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (builder) => ProfileSetupOne(
                                         image: image!,
-                                        phoneNumber:
-                                            phoneController.text.trim(),
+                                        phoneNumber: _phoneNumber.toString(),
                                         password:
                                             _passwordController.text.trim(),
                                         fullName:

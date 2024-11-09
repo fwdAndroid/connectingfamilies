@@ -153,15 +153,19 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 child: SaveButton(
                   title: "Next",
                   onTap: () {
-                    String finalSpecialSituation = showOthersField
-                        ? othersController.text
-                        : selectedSpecialSituation;
-
                     String address = countryValue +
+                            " " +
                             stateValue +
+                            " " +
                             cityValue +
+                            " " +
                             locationController.text ??
                         "No Location";
+
+                    String finalSpecialSituation =
+                        showOthersField && othersController.text.isNotEmpty
+                            ? othersController.text
+                            : selectedSpecialSituation;
 
                     Navigator.push(
                       context,
@@ -176,7 +180,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                           familyDescription: descriptionController.text.trim(),
                           confirmPassword: widget.confirmPassword,
                           fullName: widget.fullName,
-                          dob: newMemberAgeController.text.trim(),
+                          dob: newMemberAgeController.text.trim() ?? "32",
                           familyType: dropdownValue,
                         ),
                       ),

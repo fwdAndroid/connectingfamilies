@@ -53,10 +53,13 @@ class LogoutWidget extends StatelessWidget {
                                   url:
                                       "https://mamadepluton.com/mamadepluton")));
                     },
-                    child: Text(
-                      languageProvider.localizedStrings['By @mamadepluton'] ??
-                          "By @mamadepluton",
-                      style: GoogleFonts.poppins(color: firstMainColor),
+                    child: Center(
+                      child: Text(
+                        languageProvider.localizedStrings['By @mamadepluton'] ??
+                            "By @mamadepluton",
+                        style: GoogleFonts.poppins(color: firstMainColor),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
