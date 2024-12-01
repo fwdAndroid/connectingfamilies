@@ -74,7 +74,7 @@ class _EditProfileState extends State<EditProfile> {
   // Dropdown values
   String dropDownNutrition = "No Preference";
   String dropDownParenting = "Avoid using electronic devices";
-  String dropDownSpecial = "Wheel Chair";
+  String dropDownSpecial = "Wheel chair";
 
   bool isLoading = false;
 
