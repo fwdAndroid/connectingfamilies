@@ -35,13 +35,15 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   final TextEditingController addressController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   String dropdownValue = 'Woman';
-  bool showSpecialSituations = false;
-  bool showOthersField = false;
   String selectedSpecialSituation = '';
+  bool showOthersField = false;
 
   // Controllers for new member input
   final TextEditingController newMemberNameController = TextEditingController();
   final TextEditingController newMemberAgeController = TextEditingController();
+
+  // Gender list for members
+  String memberGender = 'Woman'; // Default gender when adding a new member
 
   // Manage members data
   List<Member> members = [];
@@ -63,6 +65,44 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   String countryValue = "";
   String stateValue = "";
   String cityValue = "";
+
+  DateTime? _selectedDate;
+
+  void _selectDate(BuildContext context) async {
+    DateTime currentDate = DateTime.now();
+    DateTime initialDate =
+        currentDate.subtract(Duration(days: 365 * 10)); // 100 years ago
+    DateTime firstDate =
+        currentDate.subtract(Duration(days: 365 * 120)); // 120 years ago
+    DateTime lastDate = currentDate.subtract(Duration(days: 365)); // 1 year ago
+
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  String _calculateAge() {
+    if (_selectedDate == null) return 'Age not selected';
+
+    DateTime now = DateTime.now();
+    int age = now.year - _selectedDate!.year;
+
+    if (now.month < _selectedDate!.month ||
+        (now.month == _selectedDate!.month && now.day < _selectedDate!.day)) {
+      age--;
+    }
+
+    return age.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,8 +183,29 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                   ],
                 ),
               ),
-              buildFamilyTypeSection(),
-              if (showSpecialSituations) buildSpecialSituationsSection(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Select Birth Date',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Text(
+                      _selectedDate == null
+                          ? 'Select a Date'
+                          : '${_selectedDate!.toLocal()}'.split(' ')[0],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Age: ${_calculateAge()}'),
+              ),
+              buildSpecialSituationsSection(), // Always visible
               if (showOthersField) buildOthersField(),
               buildNewMemberSection(),
               buildMembersTable(),
@@ -180,7 +241,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                           familyDescription: descriptionController.text.trim(),
                           confirmPassword: widget.confirmPassword,
                           fullName: widget.fullName,
-                          dob: newMemberAgeController.text.trim() ?? "32",
+                          dob: _calculateAge(),
                           familyType: dropdownValue,
                         ),
                       ),
@@ -195,66 +256,39 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     );
   }
 
-  Widget buildFamilyTypeSection() {
+  Widget buildSpecialSituationsSection() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildSectionTitle('Family Type*'),
-          DropdownButton<String>(
-            isExpanded: true,
-            value: dropdownValue,
-            icon: const Icon(Icons.keyboard_arrow_down),
-            items: items.map((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(item),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
+          buildSectionTitle('Special Situations*'),
+          GroupButton(
+            options: GroupButtonOptions(
+              buttonWidth: 100,
+              unselectedTextStyle:
+                  GoogleFonts.poppins(color: black, fontSize: 10),
+              selectedTextStyle:
+                  GoogleFonts.poppins(color: Colors.white, fontSize: 10),
+              selectedBorderColor: firstMainColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            onSelected: (value, index, isSelected) {
               setState(() {
-                dropdownValue = newValue!;
-                showSpecialSituations =
-                    ['Man', 'Woman', 'Boy', 'Girl'].contains(newValue);
+                if (value == "Others") {
+                  showOthersField = true;
+                  selectedSpecialSituation = '';
+                } else {
+                  showOthersField = false;
+                  selectedSpecialSituation = value.toString();
+                }
               });
             },
+            isRadio: true,
+            buttons: specialSituations,
           ),
         ],
       ),
-    );
-  }
-
-  Widget buildSpecialSituationsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildSectionTitle('Special Situations*'),
-        GroupButton(
-          options: GroupButtonOptions(
-            buttonWidth: 100,
-            unselectedTextStyle:
-                GoogleFonts.poppins(color: black, fontSize: 10),
-            selectedTextStyle:
-                GoogleFonts.poppins(color: Colors.white, fontSize: 10),
-            selectedBorderColor: firstMainColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          onSelected: (value, index, isSelected) {
-            setState(() {
-              if (value == "Others") {
-                showOthersField = true;
-                selectedSpecialSituation = '';
-              } else {
-                showOthersField = false;
-                selectedSpecialSituation = value.toString();
-              }
-            });
-          },
-          isRadio: true,
-          buttons: specialSituations,
-        ),
-      ],
     );
   }
 
@@ -317,6 +351,22 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 keyboardType: TextInputType.number,
               ),
             ),
+            const SizedBox(width: 10),
+            DropdownButton<String>(
+              value: memberGender,
+              icon: const Icon(Icons.keyboard_arrow_down),
+              items: items.map((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  memberGender = newValue!;
+                });
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
@@ -329,9 +379,11 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                       specialSituation: selectedSpecialSituation.isNotEmpty
                           ? selectedSpecialSituation
                           : (showOthersField ? othersController.text : 'No'),
+                      gender: memberGender,
                     ));
                     newMemberNameController.clear();
                     newMemberAgeController.clear();
+                    memberGender = 'Woman'; // Reset to default gender
                     selectedSpecialSituation = '';
                     showOthersField = false;
                     othersController.clear();
@@ -351,7 +403,8 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
       child: Table(
         border: TableBorder.all(),
         children: [
-          buildTableRow(['Members', 'Age', 'Special Situation', 'Actions'],
+          buildTableRow(
+              ['Members', 'Age', 'Gender', 'Special Situation', 'Actions'],
               isHeader: true),
           for (var member in members) buildMemberRow(member),
         ],
@@ -365,7 +418,9 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: isHeader
-              ? Text(cell, style: const TextStyle(fontWeight: FontWeight.bold))
+              ? Text(cell,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 10))
               : Text(cell),
         );
       }).toList(),
@@ -385,13 +440,16 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
+          child: Text(member.gender),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Text(member.specialSituation),
         ),
         IconButton(
           icon: const Icon(Icons.delete),
           onPressed: () {
             setState(() {
-              // Remove the member from the list
               members.remove(member);
             });
           },
@@ -416,10 +474,12 @@ class Member {
   final String name;
   final String age;
   final String specialSituation;
+  final String gender;
 
   Member({
     required this.name,
     required this.age,
     required this.specialSituation,
+    required this.gender,
   });
 }

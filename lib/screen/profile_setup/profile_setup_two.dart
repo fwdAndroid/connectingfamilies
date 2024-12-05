@@ -45,8 +45,10 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
   TextEditingController _nuController = TextEditingController();
   TextEditingController _controller = TextEditingController();
 
-  String selectedNutritionSituation = '';
-  String selectedParentingSituation = '';
+  List<String> selectedNutritionSituations =
+      []; // Store multiple nutrition values
+  List<String> selectedParentingSituations =
+      []; // Store multiple parenting values
 
   List<String> nutritionsList = [
     "No Preference",
@@ -74,8 +76,8 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            body: SingleChildScrollView(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      body: SingleChildScrollView(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Column(
           children: [
             Column(
@@ -110,14 +112,18 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                         setState(() {
                           if (value == "Others") {
                             showOthersField = true;
-                            selectedParentingSituation = '';
                           } else {
+                            if (isSelected) {
+                              selectedParentingSituations.add(value.toString());
+                            } else {
+                              selectedParentingSituations
+                                  .remove(value.toString());
+                            }
                             showOthersField = false;
-                            selectedParentingSituation = value.toString();
                           }
                         });
                       },
-                      isRadio: true,
+                      isRadio: false, // Allow multiple selections
                       buttons: parentingList),
                 ),
                 if (showOthersField) buildOthersField(),
@@ -155,14 +161,18 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                         setState(() {
                           if (value == "Others") {
                             showOthersFieldNu = true;
-                            selectedNutritionSituation = '';
                           } else {
+                            if (isSelected) {
+                              selectedNutritionSituations.add(value.toString());
+                            } else {
+                              selectedNutritionSituations
+                                  .remove(value.toString());
+                            }
                             showOthersFieldNu = false;
-                            selectedNutritionSituation = value.toString();
                           }
                         });
                       },
-                      isRadio: true,
+                      isRadio: false, // Allow multiple selections
                       buttons: nutritionsList),
                 ),
                 if (showOthersFieldNu) buildOthersFieldN(),
@@ -175,10 +185,10 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                   onTap: () {
                     String finalNuSituation = showOthersFieldNu
                         ? _nuController.text
-                        : selectedNutritionSituation;
+                        : selectedNutritionSituations.join(', ');
                     String finalPSituation = showOthersField
                         ? _controller.text
-                        : selectedParentingSituation;
+                        : selectedParentingSituations.join(', ');
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -201,8 +211,8 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
             )
           ],
         )
-      ]),
-    )));
+      ])),
+    ));
   }
 
   Widget buildOthersField() {
@@ -229,7 +239,7 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
             onFieldSubmitted: (value) {
               setState(() {
                 parentingList.insert(parentingList.length - 1, value);
-                selectedParentingSituation = value;
+                selectedParentingSituations.add(value);
                 showOthersField = false;
                 _controller.clear();
               });
@@ -285,7 +295,7 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
             onFieldSubmitted: (value) {
               setState(() {
                 nutritionsList.insert(nutritionsList.length - 1, value);
-                selectedNutritionSituation = value;
+                selectedNutritionSituations.add(value);
                 showOthersFieldNu = false;
                 _nuController.clear();
               });

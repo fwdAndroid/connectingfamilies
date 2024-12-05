@@ -12,9 +12,9 @@ class UserModel {
   String familyType;
   String dateofBirth;
   String specialSituation;
-  String parentingStyle;
+  final parentingStyle;
   final favorite;
-  String nutritions;
+  final nutritions;
   final interest;
   String fullName;
 

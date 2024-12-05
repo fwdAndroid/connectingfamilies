@@ -25,7 +25,6 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _reenterController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
   TextEditingController _fullNameController = TextEditingController();
   PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'US'); // Default country code
 
@@ -50,6 +49,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Uint8List? image;
+  String? phoneNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -315,7 +315,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: InternationalPhoneNumberInput(
                       onInputChanged: (PhoneNumber number) {
                         setState(() {
-                          _phoneNumber = number;
+                          phoneNumber = number.phoneNumber;
                         });
                       },
                       onInputValidated: (bool isValid) {
@@ -399,7 +399,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               MaterialPageRoute(
                                   builder: (builder) => ProfileSetupOne(
                                         image: image!,
-                                        phoneNumber: _phoneNumber.toString(),
+                                        phoneNumber: phoneNumber!,
                                         password:
                                             _passwordController.text.trim(),
                                         fullName:
