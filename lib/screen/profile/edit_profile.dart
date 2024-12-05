@@ -72,12 +72,32 @@ class _EditProfileState extends State<EditProfile> {
   String? profileImageUrl;
 
   // Dropdown values
-  String dropDownNutrition = "No Preference";
-  String dropDownParenting = "Avoid using electronic devices";
+
   String dropDownSpecial = "Wheel chair";
 
   bool isLoading = false;
-
+  List<String> selectedNutritions = [];
+  List<String> selectedParentingStyles = [];
+  final List<String> availableNutritions = [
+    "No Preference",
+    "Ultra-Processed Foods Free",
+    "Vegan",
+    "Vegetarian",
+    "Gluten Free",
+    "Sugar Free",
+    "Pork free",
+    "Others"
+  ];
+  final List<String> availableParentingStyles = [
+    "Avoid using electronic devices",
+    "Free use of electronic devices",
+    "Moderate use of electronic devices",
+    "Respectful Parenting",
+    "A Slap in Time",
+    "Never Slap in Time",
+    "My children have Phone",
+    "Others"
+  ];
   // Fetch current user ID
   String get userId => _auth.currentUser!.uid;
 
@@ -105,9 +125,9 @@ class _EditProfileState extends State<EditProfile> {
         _phoneController.text = data['phoneNumber'] ?? '';
         _locationController.text = data['location'] ?? '';
         selectedInterests = List<String>.from(data['interest'] ?? []);
-        dropDownNutrition = data['nutritions'] ?? 'No Preference';
-        dropDownParenting =
-            data['parentingStyle'] ?? 'Avoid using electronic devices';
+        selectedNutritions = List<String>.from(data['nutritions'] ?? []);
+        selectedParentingStyles =
+            List<String>.from(data['parentingStyle'] ?? []);
         dropDownSpecial = data['specialSituation'] ?? 'Wheel Chair';
         profileImageUrl = data['photo'] ?? null;
       }
@@ -152,12 +172,8 @@ class _EditProfileState extends State<EditProfile> {
         'phoneNumber': _phoneController.text,
         'location': _locationController.text,
         'interest': selectedInterests,
-        'nutritions': dropDownNutrition == 'Others'
-            ? _otherNutritionController.text
-            : dropDownNutrition,
-        'parentingStyle': dropDownParenting == 'Others'
-            ? _otherParentingController.text
-            : dropDownParenting,
+        'nutritions': selectedNutritions,
+        'parentingStyle': selectedParentingStyles,
         'specialSituation': dropDownSpecial == 'Others'
             ? _otherSpecialController.text
             : dropDownSpecial,
@@ -305,43 +321,87 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                   // Nutrition dropdown in a Column
-                  buildDropdownColumn('Nutrition', dropDownNutrition, [
-                    "No Preference",
-                    "Ultra-Processed Foods Free",
-                    "Vegan",
-                    "Vegetarian",
-                    "Gluten Free",
-                    "Sugar Free",
-                    "Pork free",
-                    "Others",
-                  ], (String? newValue) {
-                    setState(() {
-                      dropDownNutrition = newValue!;
-                    });
-                  }),
-                  if (dropDownNutrition == 'Others')
-                    buildTextField('Other Nutrition Preference',
-                        _otherNutritionController, 'Specify your nutrition'),
-                  // Parenting Style dropdown in a Column
-                  buildDropdownColumn('Parenting Style', dropDownParenting, [
-                    "Avoid using electronic devices",
-                    "Free use of electronic devices",
-                    "Moderate use of electronic devices",
-                    "Respectful Parenting",
-                    "A Slap in Time",
-                    "Never Slap in Time",
-                    "My children have Phone",
-                    "Others",
-                  ], (String? newValue) {
-                    setState(() {
-                      dropDownParenting = newValue!;
-                    });
-                  }),
-                  if (dropDownParenting == 'Others')
-                    buildTextField(
-                        'Other Parenting Style',
-                        _otherParentingController,
-                        'Specify your parenting style'),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Nutrition:', style: TextStyle(fontSize: 16)),
+                        Wrap(
+                          children: selectedNutritions
+                              .map((nutrition) => Chip(label: Text(nutrition)))
+                              .toList(),
+                        ),
+                        Wrap(
+                          spacing: 8,
+                          children: availableNutritions.map((nutrition) {
+                            final isSelected =
+                                selectedNutritions.contains(nutrition);
+                            return ChoiceChip(
+                              label: Text(nutrition),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  if (selected) {
+                                    selectedNutritions.add(nutrition);
+                                  } else {
+                                    selectedNutritions.remove(nutrition);
+                                  }
+                                });
+                              },
+                              selectedColor: firstMainColor,
+                              backgroundColor: Colors.grey.shade200,
+                              labelStyle: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+// Multi-select for Parenting Style
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Parenting Style:',
+                            style: TextStyle(fontSize: 16)),
+                        Wrap(
+                          children: selectedParentingStyles
+                              .map((style) => Chip(label: Text(style)))
+                              .toList(),
+                        ),
+                        Wrap(
+                          spacing: 8,
+                          children: availableParentingStyles.map((style) {
+                            final isSelected =
+                                selectedParentingStyles.contains(style);
+                            return ChoiceChip(
+                              label: Text(style),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  if (selected) {
+                                    selectedParentingStyles.add(style);
+                                  } else {
+                                    selectedParentingStyles.remove(style);
+                                  }
+                                });
+                              },
+                              selectedColor: firstMainColor,
+                              backgroundColor: Colors.grey.shade200,
+                              labelStyle: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   // Special Situation dropdown in a Column
                   buildDropdownColumn('Special Situation', dropDownSpecial, [
                     "Wheel chair",

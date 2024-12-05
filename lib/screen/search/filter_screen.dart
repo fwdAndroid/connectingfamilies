@@ -16,7 +16,7 @@ class _FilterScreenState extends State<FilterScreen> {
   double _location = 50; // Default value
 
   String selectedNutrition = 'No Preference'; // Default values
-  String selectedparentingStyle = 'Avoid using electronic devices';
+  String selectedParentingStyle = 'Avoid using electronic devices';
   String selectedSpecialSituation = 'Wheel chair';
   String selectedInterest = 'Camping';
 
@@ -88,6 +88,10 @@ class _FilterScreenState extends State<FilterScreen> {
   List<String> selectedSpecialSituations = [];
   List<String> selectedInterests = [];
 
+  // Age range filter
+  double _minAge = 0; // Set minimum age
+  double _maxAge = 100; // Set maximum age
+
   // Method to get filtered results from Firestore
   Future<void> getFilteredResults() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -95,23 +99,32 @@ class _FilterScreenState extends State<FilterScreen> {
     // Construct the query with selected filters
     Query query = firestore.collection('users');
 
-    // Apply filters only if a value is selected
+    // Age range filter (Handling age as a string and comparing it as an integer)
+    query = query
+        .where('age', isGreaterThanOrEqualTo: _minAge.toString())
+        .where('age', isLessThanOrEqualTo: _maxAge.toString());
+    print('Applied Age Filter: $_minAge - $_maxAge');
+
+    // Apply nutrition filter
     if (selectedNutritions.isNotEmpty) {
       query = query.where('nutritions', whereIn: selectedNutritions);
       print('Applied Nutrition Filter: $selectedNutritions');
     }
 
+    // Apply parenting style filter
     if (selectedParentingStyles.isNotEmpty) {
       query = query.where('parentingStyle', whereIn: selectedParentingStyles);
       print('Applied Parenting Style Filter: $selectedParentingStyles');
     }
 
+    // Apply special situation filter
     if (selectedSpecialSituations.isNotEmpty) {
       query =
           query.where('specialSituation', whereIn: selectedSpecialSituations);
       print('Applied Special Situation Filter: $selectedSpecialSituations');
     }
 
+    // Apply interest filter
     if (selectedInterests.isNotEmpty) {
       query = query.where('interest', arrayContainsAny: selectedInterests);
       print('Applied Interest Filter: $selectedInterests');
@@ -147,6 +160,7 @@ class _FilterScreenState extends State<FilterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Location Slider
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -155,8 +169,6 @@ class _FilterScreenState extends State<FilterScreen> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
-
-              // Location Slider
               Slider(
                 value: _location,
                 min: 0,
@@ -166,12 +178,12 @@ class _FilterScreenState extends State<FilterScreen> {
                 activeColor: firstMainColor,
                 onChanged: (double value) {
                   setState(() {
-                    _location = value; // Update location value
+                    _location = value;
                   });
                 },
               ),
               Text(
-                '${_location.round()} km', // Showing rounded value in km
+                '${_location.round()} km',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
@@ -185,7 +197,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 value: _currentAge,
                 min: 1,
                 max: 100,
-                divisions: 99, // Divides the slider into steps
+                divisions: 99,
                 label: _currentAge.round().toString(),
                 onChanged: (double value) {
                   setState(() {
@@ -194,11 +206,11 @@ class _FilterScreenState extends State<FilterScreen> {
                 },
               ),
               Text(
-                '${_currentAge.round()} Years Old', // Showing rounded value in km
+                '${_currentAge.round()} Years Old',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
 
-              // Type selection
+              // Nutrition Filter
               SizedBox(height: screenHeight * 0.02),
               Text(
                 'Select Nutrition',
@@ -211,6 +223,8 @@ class _FilterScreenState extends State<FilterScreen> {
                 }).toList(),
               ),
 
+              // Parenting Style Filter
+              SizedBox(height: screenHeight * 0.02),
               Text(
                 'Select Parenting Style',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -223,6 +237,8 @@ class _FilterScreenState extends State<FilterScreen> {
                 }).toList(),
               ),
 
+              // Special Situation Filter
+              SizedBox(height: screenHeight * 0.02),
               Text(
                 'Select Special Situation',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -235,6 +251,8 @@ class _FilterScreenState extends State<FilterScreen> {
                 }).toList(),
               ),
 
+              // Interest Filter
+              SizedBox(height: screenHeight * 0.02),
               Text(
                 'Select Interest',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -246,6 +264,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 }).toList(),
               ),
 
+              // Apply Button
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -258,16 +277,15 @@ class _FilterScreenState extends State<FilterScreen> {
                   ),
                 ),
               ),
+
+              // Display filtered results
               SizedBox(height: 20),
-              // Display filtered results in Card format
               filteredUsers.isNotEmpty
                   ? SizedBox(
                       height: 300,
                       child: ListView.builder(
-                        physics:
-                            NeverScrollableScrollPhysics(), // Disable ListView scroll inside SingleChildScrollView
-                        shrinkWrap:
-                            true, // Make ListView take only required height
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
                         itemCount: filteredUsers.length,
                         itemBuilder: (context, index) {
                           var user = filteredUsers[index];
@@ -275,64 +293,49 @@ class _FilterScreenState extends State<FilterScreen> {
                             elevation: 5,
                             margin: EdgeInsets.symmetric(vertical: 10),
                             child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(user['photo']),
-                                  ),
-                                  title: Text(
-                                    user['fullName'],
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Row(
-                                    children: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (builder) =>
-                                                        OtherUserProfile(
-                                                          phoneNumber: user[
-                                                              'phoneNumber'],
-                                                          parentingStyle: user[
-                                                              'parentingStyle'],
-                                                          nutritions: user[
-                                                              'nutritions'],
-                                                          interest:
-                                                              user['interest'],
-                                                          dateofBirth: user[
-                                                              'dateofBirth'],
-                                                          location:
-                                                              user['location'],
-                                                          specialSituation: user[
-                                                              'specialSituation'],
-                                                          email: user['email'],
-                                                          favorite:
-                                                              user['favorite'],
-                                                          familyType: user[
-                                                              'familyType'],
-                                                          familyDescription: user[
-                                                              'familyDescription'],
-                                                          photo: user['photo'],
-                                                          fullName:
-                                                              user['fullName'],
-                                                          uuid: user['uid'],
-                                                        )));
-                                          },
-                                          child: Text('View Profile')),
-                                    ],
-                                  ),
-                                )),
+                              padding: const EdgeInsets.all(16.0),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(user['photo']),
+                                ),
+                                title: Text(
+                                  user['fullName'],
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Row(
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           OtherUserProfile(
+                                        //               userId: user['id']),
+                                        //     ));
+                                      },
+                                      child: Text(
+                                        'View Profile',
+                                        style: TextStyle(color: firstMainColor),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
                     )
-                  : SizedBox(
-                      height: 100), // Display empty space if no users found
+                  : Center(
+                      child: Text(
+                        'No results found.',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
             ],
           ),
         ),
@@ -340,39 +343,20 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
-  Widget _buildSelectableContainer(
-      String option, List<String> selectedOptions) {
-    bool isSelected =
-        selectedOptions.contains(option); // Check if option is selected
-
-    return GestureDetector(
-      onTap: () {
+  // Method to handle selectable options
+  Widget _buildSelectableContainer(String option, List<String> selectedList) {
+    return ChoiceChip(
+      label: Text(option),
+      selected: selectedList.contains(option),
+      onSelected: (selected) {
         setState(() {
-          if (isSelected) {
-            selectedOptions.remove(option); // Deselect if already selected
+          if (selected) {
+            selectedList.add(option);
           } else {
-            selectedOptions.clear(); // Clear previous selections
-            selectedOptions.add(option); // Select the new option
+            selectedList.remove(option);
           }
         });
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.blue : Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color:
-                    isSelected ? Colors.blue : Colors.grey!), // Optional border
-          ),
-          child: Text(
-            option,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
-          ),
-        ),
-      ),
     );
   }
 }

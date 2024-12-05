@@ -12,8 +12,8 @@ class UserProfilePage extends StatefulWidget {
   final String email;
   final String dateofBirth;
   final String location;
-  final String nutritions;
-  final String parentingStyle;
+  final List<dynamic> nutritions;
+  final List<dynamic> parentingStyle;
   final String phoneNumber;
   final String familyDescription;
   final String uuid;
@@ -152,11 +152,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   _buildSectionTitle(
                       languageProvider.localizedStrings['Parenting Style'] ??
                           'Parenting Style'),
-                  _buildTag(widget.parentingStyle),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: List<Widget>.generate(
+                        widget.parentingStyle.length, (index) {
+                      return _buildChip(widget.parentingStyle[index]);
+                    }),
+                  ),
                   _buildSectionTitle(
                       languageProvider.localizedStrings['Nutrition'] ??
                           'Nutrition'),
-                  _buildTag(widget.nutritions),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: List<Widget>.generate(widget.nutritions.length,
+                        (index) {
+                      return _buildChip(widget.nutritions[index]);
+                    }),
+                  ),
                   SizedBox(height: screenHeight * 0.02),
 
                   // Dynamic Hobbies Chips from Firebase

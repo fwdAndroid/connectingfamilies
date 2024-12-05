@@ -15,8 +15,8 @@ class OtherUserProfile extends StatefulWidget {
   final String email;
   final String dateofBirth;
   final String location;
-  final String nutritions;
-  final String parentingStyle;
+  final List<dynamic> nutritions;
+  final List<dynamic> parentingStyle;
   final String phoneNumber;
   final String familyDescription;
   final String uuid;
@@ -324,7 +324,14 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _buildTag(widget.parentingStyle),
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: List<Widget>.generate(widget.parentingStyle.length,
+                      (index) {
+                    return _buildChip(widget.parentingStyle[index]);
+                  }),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -334,7 +341,14 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _buildTag(widget.nutritions),
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children:
+                      List<Widget>.generate(widget.nutritions.length, (index) {
+                    return _buildChip(widget.nutritions[index]);
+                  }),
+                ),
               ),
               SizedBox(height: screenHeight * 0.02),
 

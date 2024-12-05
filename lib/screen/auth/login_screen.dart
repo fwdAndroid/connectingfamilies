@@ -315,12 +315,16 @@ class _LoginScreenState extends State<LoginScreen> {
         "confrimPassword": "No Password Available",
         "favorite": [],
         "interest": ["Board Games", "Ball Park", "Pet Walks"],
-        "dateofBirth": "2024-10-23",
-        "location": locationString,
-        "nutritions": "No Preference",
-        "parentingStyle": "Moderate use of electronic devices",
+        "dateofBirth": "23",
+        "location": "Spain Madrid",
+        "nutritions": ["No Preference", "Cycling", "Vegetarian"],
+        "parentingStyle": [
+          "Moderate use of electronic devices",
+          "Respectful Parenting",
+          "Never Slap in Time"
+        ],
         "specialSituation": "Autism",
-        "uuid": user!.uid
+        "uuid": user!.uid,
       });
 
       _saveRememberMe();

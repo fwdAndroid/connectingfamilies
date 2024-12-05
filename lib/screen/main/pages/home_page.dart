@@ -80,7 +80,8 @@ class _HomePageState extends State<HomePage> {
                                   dateofBirth: snap['dateofBirth'] ?? "",
                                   specialSituation:
                                       snap['specialSituation'] ?? "",
-                                  parentingStyle: snap['parentingStyle'] ?? "",
+                                  parentingStyle: snap['parentingStyle'] ??
+                                      ['Others', 'Others', 'Others'],
                                   nutritions: snap['nutritions'] ?? "",
                                   phoneNumber: snap['phoneNumber'] ?? "",
                                   uuid: snap['uuid'] ?? "",
