@@ -11,8 +11,8 @@ class DatabaseMethods {
   Future<String> signUpUser(
       {required String confirmPassword,
       required String fullName,
-      required String nutrition,
-      required String parenting,
+      required List<String> nutrition,
+      required List<String> parenting,
       required String dob,
       required String email,
       required String familyDescription,

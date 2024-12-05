@@ -24,8 +24,8 @@ class ProfileSetupThree extends StatefulWidget {
   final String location;
   final String specialSituation;
   final String familyType;
-  final String nutrition;
-  final String parenting;
+  final List<String> nutrition;
+  final List<String> parenting;
   ProfileSetupThree(
       {super.key,
       required this.image,
@@ -187,7 +187,7 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                           setState(() {
                             isLoading = false;
                           });
-                          showMessageBar("Registration Complete", context);
+                          // showMessageBar("Registration Complete", context);
                           Navigator.push(
                               context,
                               MaterialPageRoute(

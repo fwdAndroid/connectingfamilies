@@ -45,13 +45,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
   TextEditingController _nuController = TextEditingController();
   TextEditingController _controller = TextEditingController();
 
-  List<String> selectedNutritionSituations =
-      []; // Store multiple nutrition values
-  List<String> selectedParentingSituations =
-      []; // Store multiple parenting values
+  // Lists to store multiple values for nutrition and parenting style
+  List<String> selectedNutritionSituations = [];
+  List<String> selectedParentingSituations = [];
 
   List<String> nutritionsList = [
-    "No Preference",
+    "Non Vegan", // Changed to a more descriptive value
+    "Cycling", // Changed to a more descriptive value
+    "NSFA", // Changed to a more descriptive value
     "Ultra-Processed Foods Free",
     "Vegan",
     "Vegetarian",
@@ -80,6 +81,7 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Column(
           children: [
+            // Parenting Style Selection
             Column(
               children: [
                 Padding(
@@ -129,6 +131,8 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                 if (showOthersField) buildOthersField(),
               ],
             ),
+
+            // Nutrition Selection
             Column(
               children: [
                 Padding(
@@ -178,24 +182,60 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                 if (showOthersFieldNu) buildOthersFieldN(),
               ],
             ),
+
+            // Show Selected Values
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Selected Parenting Styles:',
+                    style: GoogleFonts.poppins(
+                      color: black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    selectedParentingSituations
+                        .join(', '), // Display selected list as a string
+                    style: GoogleFonts.poppins(color: black),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Selected Nutrition Preferences:',
+                    style: GoogleFonts.poppins(
+                      color: black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    selectedNutritionSituations
+                        .join(', '), // Display selected list as a string
+                    style: GoogleFonts.poppins(color: black),
+                  ),
+                ],
+              ),
+            ),
+
+            // Next Button
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SaveButton(
-                  title: " Next",
+                  title: "Next",
                   onTap: () {
-                    String finalNuSituation = showOthersFieldNu
-                        ? _nuController.text
-                        : selectedNutritionSituations.join(', ');
-                    String finalPSituation = showOthersField
-                        ? _controller.text
-                        : selectedParentingSituations.join(', ');
+                    // Here we can pass the selected values to the next screen or save them.
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (builder) => ProfileSetupThree(
                                   email: widget.email,
-                                  parenting: finalPSituation,
-                                  nutrition: finalNuSituation,
+                                  parenting: selectedParentingSituations,
+                                  nutrition: selectedNutritionSituations,
                                   location: widget.location,
                                   password: widget.password,
                                   phoneNumber: widget.phoneNumber,
@@ -208,13 +248,14 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                                   familyType: widget.familyType,
                                 )));
                   }),
-            )
+            ),
           ],
         )
       ])),
     ));
   }
 
+  // Specify Parenting Style
   Widget buildOthersField() {
     return Column(
       children: [
@@ -270,7 +311,7 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
     );
   }
 
-  //Nutrition
+  // Specify Nutrition
   Widget buildOthersFieldN() {
     return Column(
       children: [

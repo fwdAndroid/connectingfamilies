@@ -71,7 +71,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   void _selectDate(BuildContext context) async {
     DateTime currentDate = DateTime.now();
     DateTime initialDate =
-        currentDate.subtract(Duration(days: 365 * 10)); // 100 years ago
+        currentDate.subtract(Duration(days: 365 * 40)); // 100 years ago
     DateTime firstDate =
         currentDate.subtract(Duration(days: 365 * 120)); // 120 years ago
     DateTime lastDate = currentDate.subtract(Duration(days: 365)); // 1 year ago
@@ -214,6 +214,9 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 child: SaveButton(
                   title: "Next",
                   onTap: () {
+                    print(
+                        'Selected Group Button Value: $selectedSpecialSituation');
+
                     String address = countryValue +
                             " " +
                             stateValue +
@@ -223,11 +226,6 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                             locationController.text ??
                         "No Location";
 
-                    String finalSpecialSituation =
-                        showOthersField && othersController.text.isNotEmpty
-                            ? othersController.text
-                            : selectedSpecialSituation;
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -236,7 +234,8 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                           location: address,
                           password: widget.password,
                           phoneNumber: widget.phoneNumber,
-                          specialSituation: finalSpecialSituation,
+                          specialSituation:
+                              selectedSpecialSituation ?? "Wheel Chair",
                           image: widget.image,
                           familyDescription: descriptionController.text.trim(),
                           confirmPassword: widget.confirmPassword,
@@ -281,6 +280,8 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 } else {
                   showOthersField = false;
                   selectedSpecialSituation = value.toString();
+                  print(
+                      'Selected Group Button Value: $selectedSpecialSituation');
                 }
               });
             },
