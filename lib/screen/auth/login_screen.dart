@@ -89,7 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   children: [
                     Text(
-                      languageProvider.localizedStrings['language'] ??
+                      languageProvider.localizedStrings[
+                              'Educating emotions with love'] ??
                           "Educating emotions with love",
                       style: GoogleFonts.poppins(
                           fontSize: 14,
