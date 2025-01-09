@@ -24,11 +24,11 @@ class _ReportAccountState extends State<ReportAccount> {
 
   TextEditingController _messageController = TextEditingController();
   Uint8List? image;
-  bool isloading = false;
+  bool isloading = false; // This will control the loading spinner
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context); // Access
-
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -103,6 +103,11 @@ class _ReportAccountState extends State<ReportAccount> {
                           size.height * 0.06), // Responsive button size
                     ),
                   ),
+            SizedBox(height: 16),
+            // Show loading spinner when selecting or uploading the image
+            isloading
+                ? Center(child: CircularProgressIndicator())
+                : SizedBox.shrink(),
             Spacer(), // Push the send button to the bottom
             // Send button
             SizedBox(
@@ -114,7 +119,8 @@ class _ReportAccountState extends State<ReportAccount> {
                     showMessageBar("Text is Required", context);
                   } else {
                     setState(() {
-                      isloading = true;
+                      isloading =
+                          true; // Show the spinner when starting the upload
                     });
 
                     // Attempt to upload image only if it's selected
@@ -162,7 +168,7 @@ class _ReportAccountState extends State<ReportAccount> {
                           context);
                     } finally {
                       setState(() {
-                        isloading = false;
+                        isloading = false; // Hide the spinner after completion
                       });
                     }
                   }
@@ -178,9 +184,13 @@ class _ReportAccountState extends State<ReportAccount> {
   }
 
   selectImage() async {
+    setState(() {
+      isloading = true; // Show spinner while selecting the image
+    });
     Uint8List ui = await pickImage(ImageSource.gallery);
     setState(() {
       image = ui;
+      isloading = false; // Hide spinner after the image is selected
     });
   }
 }

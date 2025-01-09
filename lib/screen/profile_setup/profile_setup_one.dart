@@ -214,37 +214,38 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 child: SaveButton(
                   title: "Next",
                   onTap: () {
-                    print(
-                        'Selected Group Button Value: $selectedSpecialSituation');
-
-                    String address = countryValue +
-                            " " +
-                            stateValue +
-                            " " +
-                            cityValue +
-                            " " +
-                            locationController.text ??
-                        "No Location";
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (builder) => ProfileSetupTwo(
-                          email: widget.email,
-                          location: address,
-                          password: widget.password,
-                          phoneNumber: widget.phoneNumber,
-                          specialSituation:
-                              selectedSpecialSituation ?? "Wheel Chair",
-                          image: widget.image,
-                          familyDescription: descriptionController.text.trim(),
-                          confirmPassword: widget.confirmPassword,
-                          fullName: widget.fullName,
-                          dob: _calculateAge(),
-                          familyType: dropdownValue,
+                    if (locationController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Please enter a Address.')));
+                    } else {
+                      String address = countryValue +
+                          " " +
+                          stateValue +
+                          " " +
+                          cityValue +
+                          " " +
+                          locationController.text;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => ProfileSetupTwo(
+                            email: widget.email,
+                            location: address,
+                            password: widget.password,
+                            phoneNumber: widget.phoneNumber,
+                            specialSituation:
+                                selectedSpecialSituation ?? "Wheel Chair",
+                            image: widget.image,
+                            familyDescription:
+                                descriptionController.text.trim(),
+                            confirmPassword: widget.confirmPassword,
+                            fullName: widget.fullName,
+                            dob: _calculateAge(),
+                            familyType: dropdownValue,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                 ),
               ),

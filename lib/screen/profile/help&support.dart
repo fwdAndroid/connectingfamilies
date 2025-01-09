@@ -22,7 +22,7 @@ class HelpSupport extends StatefulWidget {
 class _HelpSupportState extends State<HelpSupport> {
   TextEditingController _messageController = TextEditingController();
   Uint8List? image;
-  bool isloading = false;
+  bool isloading = false; // This will control the loading spinner
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +99,11 @@ class _HelpSupportState extends State<HelpSupport> {
                       minimumSize: Size(double.infinity, size.height * 0.06),
                     ),
                   ),
+            SizedBox(height: 16),
+            // Show a loading spinner when uploading or selecting an image
+            isloading
+                ? Center(child: CircularProgressIndicator())
+                : SizedBox.shrink(),
             Spacer(),
             SizedBox(
               width: double.infinity,
@@ -109,7 +114,8 @@ class _HelpSupportState extends State<HelpSupport> {
                     showMessageBar("Text is Required", context);
                   } else {
                     setState(() {
-                      isloading = true;
+                      isloading =
+                          true; // Show the spinner when starting the upload
                     });
 
                     String photo = image != null
@@ -127,7 +133,7 @@ class _HelpSupportState extends State<HelpSupport> {
                     });
 
                     setState(() {
-                      isloading = false;
+                      isloading = false; // Hide the spinner after completion
                     });
 
                     // Show the dialog box
@@ -164,9 +170,13 @@ class _HelpSupportState extends State<HelpSupport> {
   }
 
   selectImage() async {
+    setState(() {
+      isloading = true; // Show spinner while selecting the image
+    });
     Uint8List ui = await pickImage(ImageSource.gallery);
     setState(() {
       image = ui;
+      isloading = false; // Hide spinner after selecting the image
     });
   }
 }
