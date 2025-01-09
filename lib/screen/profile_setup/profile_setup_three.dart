@@ -170,6 +170,7 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                           });
 
                           DatabaseMethods().signUpUser(
+                              context: context,
                               confirmPassword: widget.confirmPassword,
                               fullName: widget.fullName,
                               nutrition: widget.nutrition,

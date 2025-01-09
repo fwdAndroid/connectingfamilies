@@ -4,35 +4,51 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/models/user_model.dart';
 import 'package:connectingfamilies/service/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart'; // Import this for BuildContext
 import 'package:google_sign_in/google_sign_in.dart';
 
 class DatabaseMethods {
   // Add Service
-  Future<String> signUpUser(
-      {required String confirmPassword,
-      required String fullName,
-      required List<String> nutrition,
-      required List<String> parenting,
-      required String dob,
-      required String email,
-      required String familyDescription,
-      required String location,
-      required String password,
-      required String familyType,
-      required List<String> interest,
-      required String phoneNumber,
-      required String specialSituation,
-      required Uint8List file}) async {
-    String res = 'Wrong Email or Password';
+  Future<String> signUpUser({
+    required BuildContext context, // Add BuildContext
+    required String confirmPassword,
+    required String fullName,
+    required List<String> nutrition,
+    required List<String> parenting,
+    required String dob,
+    required String email,
+    required String familyDescription,
+    required String location,
+    required String password,
+    required String familyType,
+    required List<String> interest,
+    required String phoneNumber,
+    required String specialSituation,
+    required Uint8List file,
+  }) async {
+    String res = 'An error occurred';
     try {
-      if (email.isNotEmpty || password.isNotEmpty || fullName.isNotEmpty) {
+      // Check if email is already registered
+      List<String> methods =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty) {
+        // Show error message in Scaffold
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email is already registered')),
+        );
+        return 'Email is already registered';
+      }
+
+      if (email.isNotEmpty && password.isNotEmpty && fullName.isNotEmpty) {
         UserCredential cred = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
+
         String photoURL = await StorageMethods().uploadImageToStorage(
           'ProfilePics',
           file,
         );
-        //Add User to the database with modal
+
+        // Add User to the database with model
         UserModel userModel = UserModel(
           familyType: familyType,
           photo: photoURL,
@@ -49,18 +65,22 @@ class DatabaseMethods {
           fullName: fullName,
           specialSituation: specialSituation,
           email: email,
-
           password: password,
-          // photoURL: photoURL
         );
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(cred.user!.uid)
             .set(userModel.toJson());
+
         res = 'success';
       }
     } catch (e) {
       res = e.toString();
+      // Optionally display the error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res)),
+      );
     }
     return res;
   }
@@ -69,20 +89,20 @@ class DatabaseMethods {
     required String email,
     required String pass,
   }) async {
-    String res = ' Wrong Email or Password';
+    String res = 'Wrong Email or Password';
     try {
-      if (email.isNotEmpty || pass.isNotEmpty) {
+      if (email.isNotEmpty && pass.isNotEmpty) {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: pass);
-
         res = 'success';
+      } else {
+        res = 'Please fill in all fields';
       }
-    } on FirebaseException catch (e) {
-      if (e == 'WrongEmail') {
-        print(e.message);
-      }
-      if (e == 'WrongPassword') {
-        print(e.message);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        res = 'No user found for this email.';
+      } else if (e.code == 'wrong-password') {
+        res = 'Wrong password provided.';
       }
     } catch (e) {
       res = e.toString();
@@ -90,7 +110,7 @@ class DatabaseMethods {
     return res;
   }
 
-  //Google SignIn
+  // Google SignIn
   Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 

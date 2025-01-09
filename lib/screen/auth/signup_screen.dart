@@ -392,7 +392,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         setState(() {
                           isLoading = true;
                         });
-                        print(_phoneNumber);
+
                         if (_formKey.currentState?.validate() ?? false) {
                           Navigator.push(
                               context,
