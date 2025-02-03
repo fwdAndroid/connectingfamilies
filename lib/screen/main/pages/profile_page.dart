@@ -311,14 +311,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 40,
                 height: 40,
               ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (builder) => Webpage(
-                              title: "",
-                              url: "https://www.instagram.com/mamadepluton/",
-                            )));
+              onTap: () async {
+                final Uri instagramUri =
+                    Uri.parse("https://www.instagram.com/mamadepluton/");
+
+                if (await canLaunch(instagramUri.toString())) {
+                  await launch(instagramUri.toString());
+                } else {
+                  // Handle the case where the app cannot be opened
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not launch Instagram')),
+                  );
+                }
               },
               trailing: Icon(
                 Icons.keyboard_arrow_right,

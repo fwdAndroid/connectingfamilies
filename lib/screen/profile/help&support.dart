@@ -81,29 +81,29 @@ class _HelpSupportState extends State<HelpSupport> {
                       ),
                     ),
                   )
-                : ElevatedButton.icon(
-                    onPressed: () {
-                      selectImage();
-                    },
-                    icon: Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(languageProvider
-                            .localizedStrings['Add a Screenshot (optional)'] ??
-                        'Add a Screenshot (optional)'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: colorWhite,
-                      backgroundColor: firstMainColor,
-                      side: BorderSide(color: firstMainColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                : isloading
+                    ? Center(child: CircularProgressIndicator())
+                    : ElevatedButton.icon(
+                        onPressed: () {
+                          selectImage();
+                        },
+                        icon: Icon(Icons.add_photo_alternate_outlined),
+                        label: Text(languageProvider.localizedStrings[
+                                'Add a Screenshot (optional)'] ??
+                            'Add a Screenshot (optional)'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: colorWhite,
+                          backgroundColor: firstMainColor,
+                          side: BorderSide(color: firstMainColor),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          minimumSize:
+                              Size(double.infinity, size.height * 0.06),
+                        ),
                       ),
-                      minimumSize: Size(double.infinity, size.height * 0.06),
-                    ),
-                  ),
             SizedBox(height: 16),
             // Show a loading spinner when uploading or selecting an image
-            isloading
-                ? Center(child: CircularProgressIndicator())
-                : SizedBox.shrink(),
             Spacer(),
             SizedBox(
               width: double.infinity,

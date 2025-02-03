@@ -70,13 +70,64 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
     });
   }
 
+  Future<void> initiateChat(BuildContext context) async {
+    final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    String chatId = currentUserUid.compareTo(widget.uuid) <= 0
+        ? "${currentUserUid}_${widget.uuid}"
+        : "${widget.uuid}_${currentUserUid}";
+
+    DocumentReference chatRef =
+        FirebaseFirestore.instance.collection("chats").doc(chatId);
+
+    // Check if chat already exists
+    DocumentSnapshot chatSnap = await chatRef.get();
+
+    if (!chatSnap.exists) {
+      // Fetch current user data
+      final currentUserDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUserUid)
+          .get();
+
+      if (!currentUserDoc.exists) return;
+
+      var currentUserData = currentUserDoc.data()!;
+      await chatRef.set({
+        "chatId": chatId,
+        "users": [currentUserUid, widget.uuid], // Important for queries
+        "user1Id": currentUserUid,
+        "user2Id": widget.uuid,
+        "user1Name": currentUserData['fullName'],
+        "user2Name": widget.fullName,
+        "user1Photo": currentUserData['photo'] ?? "",
+        "user2Photo": widget.photo,
+        "lastMessage": "",
+        "lastMessageTime": 0,
+        "lastMessageSeen": false
+      });
+    }
+
+    // Navigate to Chat Screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          chatId: chatId,
+          friendId: widget.uuid,
+          friendName: widget.fullName,
+          friendImage: widget.photo,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final languageProvider = Provider.of<LanguageProvider>(context);
 
-    var uuid = Uuid().v4();
+    var uuid1 = Uuid().v4();
 
     return SafeArea(
       child: Scaffold(
@@ -164,78 +215,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               }
                               var snap = snapshot.data;
                               return GestureDetector(
-                                onTap: () async {
-                                  final currentUserId =
-                                      FirebaseAuth.instance.currentUser!.uid;
-                                  final friendId = widget.uuid;
-                                  final chatQuery = await FirebaseFirestore
-                                      .instance
-                                      .collection("chats")
-                                      .where("userId", isEqualTo: currentUserId)
-                                      .where("friendId", isEqualTo: friendId)
-                                      .get();
-
-                                  final reverseChatQuery =
-                                      await FirebaseFirestore.instance
-                                          .collection("chats")
-                                          .where("userId", isEqualTo: friendId)
-                                          .where("friendId",
-                                              isEqualTo: currentUserId)
-                                          .get();
-
-                                  if (chatQuery.docs.isNotEmpty ||
-                                      reverseChatQuery.docs.isNotEmpty) {
-                                    // If chat exists, get the existing chat document ID
-                                    var chatDoc = chatQuery.docs.isNotEmpty
-                                        ? chatQuery.docs.first
-                                        : reverseChatQuery.docs.first;
-
-                                    // Navigate to the chat page without creating a new document
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatMessages(
-                                          chatUUid: chatDoc['chatId'],
-                                          userId: currentUserId,
-                                          userName: snap['fullName'],
-                                          userPhoto: snap['photo'],
-                                          friendId: friendId,
-                                          friendName: widget.fullName,
-                                          friendPhoto: widget.photo,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    // If no chat exists, create a new chat document
-                                    await FirebaseFirestore.instance
-                                        .collection("chats")
-                                        .doc(uuid)
-                                        .set({
-                                      "chatId": uuid,
-                                      "userId": currentUserId,
-                                      "userName": snap['fullName'],
-                                      "userPhoto": snap['photo'],
-                                      "friendId": friendId,
-                                      "friendName": widget.fullName,
-                                      "friendPhoto": widget.photo,
-                                    });
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatMessages(
-                                          chatUUid: uuid,
-                                          userId: currentUserId,
-                                          userName: snap['fullName'],
-                                          userPhoto: snap['photo'],
-                                          friendId: friendId,
-                                          friendName: widget.fullName,
-                                          friendPhoto: widget.photo,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
+                                onTap: () => initiateChat(context),
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
                                   radius: 24,

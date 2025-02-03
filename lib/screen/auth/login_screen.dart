@@ -352,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Don’t have an account? ',
             children: <InlineSpan>[
               TextSpan(
-                text: 'Sign Up',
+                text: languageProvider.localizedStrings['Sign Up'] ?? 'Sign Up',
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

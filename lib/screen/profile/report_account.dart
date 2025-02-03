@@ -84,30 +84,30 @@ class _ReportAccountState extends State<ReportAccount> {
                         },
                         child: CircleAvatar(
                             radius: 59, backgroundImage: MemoryImage(image!))))
-                : ElevatedButton.icon(
-                    onPressed: () {
-                      selectImage();
-                    },
-                    icon: Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(languageProvider
-                            .localizedStrings['Add a Screenshot (optional)'] ??
-                        'Add a Screenshot (optional)'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: colorWhite,
-                      backgroundColor: firstMainColor,
-                      side: BorderSide(color: firstMainColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                : isloading
+                    ? Center(child: CircularProgressIndicator())
+                    : ElevatedButton.icon(
+                        onPressed: () {
+                          selectImage();
+                        },
+                        icon: Icon(Icons.add_photo_alternate_outlined),
+                        label: Text(languageProvider.localizedStrings[
+                                'Add a Screenshot (optional)'] ??
+                            'Add a Screenshot (optional)'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: colorWhite,
+                          backgroundColor: firstMainColor,
+                          side: BorderSide(color: firstMainColor),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          minimumSize: Size(double.infinity,
+                              size.height * 0.06), // Responsive button size
+                        ),
                       ),
-                      minimumSize: Size(double.infinity,
-                          size.height * 0.06), // Responsive button size
-                    ),
-                  ),
             SizedBox(height: 16),
             // Show loading spinner when selecting or uploading the image
-            isloading
-                ? Center(child: CircularProgressIndicator())
-                : SizedBox.shrink(),
+
             Spacer(), // Push the send button to the bottom
             // Send button
             SizedBox(
