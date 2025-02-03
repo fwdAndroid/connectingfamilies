@@ -347,9 +347,9 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text.rich(TextSpan(
-            text:
-                languageProvider.localizedStrings['Don’t have an account? '] ??
-                    'Don’t have an account? ',
+            text: languageProvider
+                    .localizedStrings["Don't have an account? Sign up"] ??
+                'Don’t have an account? ',
             children: <InlineSpan>[
               TextSpan(
                 text: languageProvider.localizedStrings['Sign Up'] ?? 'Sign Up',
