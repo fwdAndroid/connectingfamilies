@@ -2,30 +2,41 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/models/user_model.dart';
+import 'package:connectingfamilies/screen/profile_setup/app_regulation.dart';
 import 'package:connectingfamilies/service/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import this for BuildContext
 import 'package:google_sign_in/google_sign_in.dart';
 
 class DatabaseMethods {
+  Future<bool> checkIfEmailExists(String email) async {
+    try {
+      final List<String> methods =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      return methods.isNotEmpty; // Returns true if the email exists.
+    } catch (e) {
+      throw Exception("Error checking email: ${e.toString()}");
+    }
+  }
+
   // Add Service
-  Future<String> signUpUser({
-    required BuildContext context, // Add BuildContext
-    required String confirmPassword,
-    required String fullName,
-    required List<String> nutrition,
-    required List<String> parenting,
-    required String dob,
-    required String email,
-    required String familyDescription,
-    required String location,
-    required String password,
-    required String familyType,
-    required List<String> interest,
-    required String phoneNumber,
-    required String specialSituation,
-    required Uint8List file,
-  }) async {
+  Future<String> signUpUser(
+      {required BuildContext context, // Add BuildContext
+      required String confirmPassword,
+      required String fullName,
+      required List<String> nutrition,
+      required List<String> parenting,
+      required String dob,
+      required String email,
+      required String familyDescription,
+      required String location,
+      required String password,
+      required String familyType,
+      required List<String> interest,
+      required String phoneNumber,
+      required String specialSituation,
+      required Uint8List file,
+      required List<Map<String, String>> familyMembers}) async {
     String res = 'An error occurred';
     try {
       // Check if email is already registered
@@ -34,46 +45,49 @@ class DatabaseMethods {
       if (methods.isNotEmpty) {
         // Show error message in Scaffold
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Email is already registered')),
+          const SnackBar(content: Text('Email is already registered')),
         );
         return 'Email is already registered';
-      }
+      } else {
+        if (email.isNotEmpty && password.isNotEmpty && fullName.isNotEmpty) {
+          UserCredential cred = await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(email: email, password: password);
 
-      if (email.isNotEmpty && password.isNotEmpty && fullName.isNotEmpty) {
-        UserCredential cred = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: email, password: password);
+          String photoURL = await StorageMethods().uploadImageToStorage(
+            'ProfilePics',
+            file,
+          );
 
-        String photoURL = await StorageMethods().uploadImageToStorage(
-          'ProfilePics',
-          file,
-        );
+          // Add User to the database with model
+          UserModel userModel = UserModel(
+            familyMembers: familyMembers,
+            familyType: familyType,
+            photo: photoURL,
+            uuid: cred.user!.uid,
+            parentingStyle: parenting,
+            phoneNumber: phoneNumber,
+            favorite: [],
+            confrimPassword: confirmPassword,
+            location: location,
+            interest: interest,
+            dateofBirth: dob,
+            familyDescription: familyDescription,
+            nutritions: nutrition,
+            fullName: fullName,
+            specialSituation: specialSituation,
+            email: email,
+            password: password,
+          );
 
-        // Add User to the database with model
-        UserModel userModel = UserModel(
-          familyType: familyType,
-          photo: photoURL,
-          uuid: cred.user!.uid,
-          parentingStyle: parenting,
-          phoneNumber: phoneNumber,
-          favorite: [],
-          confrimPassword: confirmPassword,
-          location: location,
-          interest: interest,
-          dateofBirth: dob,
-          familyDescription: familyDescription,
-          nutritions: nutrition,
-          fullName: fullName,
-          specialSituation: specialSituation,
-          email: email,
-          password: password,
-        );
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(cred.user!.uid)
+              .set(userModel.toJson());
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(cred.user!.uid)
-            .set(userModel.toJson());
-
-        res = 'success';
+          res = 'success';
+          Navigator.push(context,
+              MaterialPageRoute(builder: (builder) => AppRegulation()));
+        }
       }
     } catch (e) {
       res = e.toString();

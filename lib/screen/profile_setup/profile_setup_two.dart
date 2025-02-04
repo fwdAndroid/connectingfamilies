@@ -20,12 +20,14 @@ class ProfileSetupTwo extends StatefulWidget {
   final String location;
   final String specialSituation;
   final String familyType;
+  final List<Map<String, String>> familyMembers;
   ProfileSetupTwo(
       {super.key,
       required this.image,
       required this.confirmPassword,
       required this.fullName,
       required this.dob,
+      required this.familyMembers,
       required this.email,
       required this.familyDescription,
       required this.location,
@@ -233,6 +235,7 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                         context,
                         MaterialPageRoute(
                             builder: (builder) => ProfileSetupThree(
+                                  familyMembers: widget.familyMembers,
                                   email: widget.email,
                                   parenting: selectedParentingSituations,
                                   nutrition: selectedNutritionSituations,

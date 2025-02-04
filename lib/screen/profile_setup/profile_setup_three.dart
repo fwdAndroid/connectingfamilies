@@ -1,16 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:connectingfamilies/screen/profile/legal_terms.dart';
-import 'package:connectingfamilies/screen/profile_setup/app_regulation.dart';
 import 'package:connectingfamilies/service/database.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
-import 'package:connectingfamilies/uitls/image_picker.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
-
-import 'app_regulation.dart';
 
 class ProfileSetupThree extends StatefulWidget {
   String familyDescription;
@@ -26,11 +21,13 @@ class ProfileSetupThree extends StatefulWidget {
   final String familyType;
   final List<String> nutrition;
   final List<String> parenting;
+  final List<Map<String, String>> familyMembers;
   ProfileSetupThree(
       {super.key,
       required this.image,
       required this.confirmPassword,
       required this.fullName,
+      required this.familyMembers,
       required this.nutrition,
       required this.parenting,
       required this.dob,
@@ -170,6 +167,7 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                           });
 
                           DatabaseMethods().signUpUser(
+                              familyMembers: widget.familyMembers,
                               context: context,
                               confirmPassword: widget.confirmPassword,
                               fullName: widget.fullName,
@@ -189,10 +187,10 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                             isLoading = false;
                           });
                           // showMessageBar("Registration Complete", context);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => AppRegulation()));
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (builder) => AppRegulation()));
                         }),
                   )
           ],

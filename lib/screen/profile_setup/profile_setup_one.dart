@@ -229,6 +229,15 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                         context,
                         MaterialPageRoute(
                           builder: (builder) => ProfileSetupTwo(
+                            familyMembers: [
+                              {
+                                "name": newMemberNameController.text,
+                                "age": newMemberAgeController.text,
+                                "gender": memberGender,
+                                "specialSituation":
+                                    selectedSpecialSituation ?? "No"
+                              }
+                            ],
                             email: widget.email,
                             location: address,
                             password: widget.password,

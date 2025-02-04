@@ -17,6 +17,7 @@ class UserModel {
   final nutritions;
   final interest;
   String fullName;
+  var familyMembers;
 
   UserModel({
     required this.uuid,
@@ -27,6 +28,7 @@ class UserModel {
     required this.confrimPassword,
     required this.interest,
     required this.favorite,
+    required this.familyMembers,
     required this.location,
     required this.familyType,
     required this.specialSituation,
@@ -53,6 +55,7 @@ class UserModel {
         'specialSituation': specialSituation,
         'favorite': favorite,
         'nutritions': nutritions,
+        'familyMembers': familyMembers,
         'interest': interest,
         'fullName': fullName,
       };
@@ -63,6 +66,7 @@ class UserModel {
 
     return UserModel(
       photo: snapshot['photo'],
+      familyMembers: snapshot['familyMembers'],
       email: snapshot['email'],
       uuid: snapshot['uuid'],
       password: snapshot['password'],
