@@ -204,7 +204,9 @@ class _EditProfileState extends State<EditProfile> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SaveButton(
-                      title: "Edit Profile",
+                      title:
+                          languageProvider.localizedStrings['Edit Profile'] ??
+                              "Edit Profile",
                       onTap: () {
                         updateUserProfile();
                       },
@@ -219,7 +221,9 @@ class _EditProfileState extends State<EditProfile> {
                             MaterialPageRoute(
                                 builder: (builder) => EditNutrition()));
                       },
-                      title: "Edit Nutrition & Parenting Style",
+                      title: languageProvider.localizedStrings[
+                              'Edit Nutrition & Parenting Style'] ??
+                          "Edit Nutrition & Parenting Style",
                     ),
                   ),
                   Padding(
@@ -231,7 +235,9 @@ class _EditProfileState extends State<EditProfile> {
                             MaterialPageRoute(
                                 builder: (builder) => EditInterest()));
                       },
-                      title: "Edit Interest",
+                      title:
+                          languageProvider.localizedStrings['Edit Interest'] ??
+                              "Edit Interest",
                     ),
                   )
                 ],

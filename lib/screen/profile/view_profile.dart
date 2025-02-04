@@ -282,7 +282,8 @@ class _ViewProfileState extends State<ViewProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Interests",
+                        languageProvider.localizedStrings['Interests'] ??
+                            "Interests",
                         style: TextStyle(
                             color: black,
                             fontSize: 22,
@@ -305,7 +306,8 @@ class _ViewProfileState extends State<ViewProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Parenting Style",
+                        languageProvider.localizedStrings['Parenting Style'] ??
+                            "Parenting Style",
                         style: TextStyle(
                             color: black,
                             fontSize: 22,
@@ -328,7 +330,8 @@ class _ViewProfileState extends State<ViewProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Nutrition",
+                        languageProvider.localizedStrings['Nutrition'] ??
+                            "Nutrition",
                         style: TextStyle(
                             color: black,
                             fontSize: 22,
@@ -425,7 +428,9 @@ class _ViewProfileState extends State<ViewProfile> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SaveButton(
-                      title: "Update Profile",
+                      title:
+                          languageProvider.localizedStrings['Update Profile'] ??
+                              "Update Profile",
                       onTap: () {
                         Navigator.push(
                             context,
