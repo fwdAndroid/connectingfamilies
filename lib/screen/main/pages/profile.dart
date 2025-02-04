@@ -1,5 +1,5 @@
 import 'package:connectingfamilies/provider/language_provider.dart';
-import 'package:connectingfamilies/screen/profile/edit_profile.dart';
+import 'package:connectingfamilies/screen/profile/view_profile.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:flutter/material.dart';
@@ -195,7 +195,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (builder) => EditProfile()));
+                                builder: (builder) => ViewProfile()));
                       },
                       title:
                           languageProvider.localizedStrings['Edit Profile'] ??

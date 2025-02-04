@@ -148,9 +148,8 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                     padding: const EdgeInsets.all(8.0),
                     child: SaveButton(
                         title: " Registered",
-                        onTap: () {
+                        onTap: () async {
                           if (selectedActivities.length < 3) {
-                            // Check if at least 3 activities are selected
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                   content: Text(
@@ -162,37 +161,39 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                               othersController.text.isNotEmpty) {
                             selectedActivities.add(othersController.text);
                           }
+
                           setState(() {
                             isLoading = true;
                           });
 
-                          DatabaseMethods().signUpUser(
-                              familyMembers: widget.familyMembers,
-                              context: context,
-                              confirmPassword: widget.confirmPassword,
-                              fullName: widget.fullName,
-                              nutrition: widget.nutrition,
-                              parenting: widget.parenting,
-                              dob: widget.dob,
-                              email: widget.email,
-                              familyDescription: widget.familyDescription,
-                              location: widget.location,
-                              password: widget.password,
-                              familyType: widget.familyType,
-                              interest: selectedActivities,
-                              phoneNumber: widget.phoneNumber,
-                              specialSituation: widget.specialSituation,
-                              file: widget.image);
+                          await DatabaseMethods().signUpUser(
+                            familyMembers: widget.familyMembers,
+                            context: context,
+                            confirmPassword: widget.confirmPassword,
+                            fullName: widget.fullName,
+                            nutrition: widget.nutrition,
+                            parenting: widget.parenting,
+                            dob: widget.dob,
+                            email: widget.email,
+                            familyDescription: widget.familyDescription,
+                            location: widget.location,
+                            password: widget.password,
+                            familyType: widget.familyType,
+                            interest: selectedActivities,
+                            phoneNumber: widget.phoneNumber,
+                            specialSituation: widget.specialSituation,
+                            file: widget.image,
+                          );
+
                           setState(() {
                             isLoading = false;
                           });
-                          // showMessageBar("Registration Complete", context);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (builder) => AppRegulation()));
-                        }),
-                  )
+
+                          // Show success message or navigate
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Registration Complete')),
+                          );
+                        }))
           ],
         )
       ]),

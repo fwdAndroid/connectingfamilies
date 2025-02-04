@@ -225,19 +225,20 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                           cityValue +
                           " " +
                           locationController.text;
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (builder) => ProfileSetupTwo(
-                            familyMembers: [
-                              {
-                                "name": newMemberNameController.text,
-                                "age": newMemberAgeController.text,
-                                "gender": memberGender,
-                                "specialSituation":
-                                    selectedSpecialSituation ?? "No"
-                              }
-                            ],
+                            familyMembers: members
+                                .map((member) => {
+                                      "name": member.name,
+                                      "age": member.age,
+                                      "gender": member.gender,
+                                      "specialSituation":
+                                          member.specialSituation
+                                    })
+                                .toList(),
                             email: widget.email,
                             location: address,
                             password: widget.password,
