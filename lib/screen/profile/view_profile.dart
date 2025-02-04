@@ -118,7 +118,7 @@ class _ViewProfileState extends State<ViewProfile> {
         // Ensure that Nutritions Style is properly cast to List<String>
 
         var bb = data['nutritions'];
-        if (parentingStyle is List) {
+        if (bb is List) {
           nutrition = List<String>.from(bb);
         } else {
           nutrition = [];
