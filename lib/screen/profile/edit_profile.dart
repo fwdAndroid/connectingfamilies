@@ -219,7 +219,7 @@ class _EditProfileState extends State<EditProfile> {
                             MaterialPageRoute(
                                 builder: (builder) => EditNutrition()));
                       },
-                      title: "Edit Nutritions & Parenting Style",
+                      title: "Edit Nutrition & Parenting Style",
                     ),
                   ),
                   Padding(

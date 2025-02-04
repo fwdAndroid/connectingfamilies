@@ -82,5 +82,9 @@
     "Yes": "Sim",
     "Oh No, You are leaving": "Oh não, você está saindo",
     "Are you sure you want to logout?": "Tem certeza de que deseja sair?",
-    "Logout Successfully": "Logout realizado com sucesso"
+    "Logout Successfully": "Logout realizado com sucesso",
+    "View Profile":"Ver Perfil",
+    "Edit Nutrition & Parenting Style":"Editar Nutrição e Estilo Parental",
+    "Edit Interest":"Editar Interesse",
+    "Update Profile": "Atualizar Perfil"
 }

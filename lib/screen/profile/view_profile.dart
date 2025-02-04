@@ -221,7 +221,7 @@ class _ViewProfileState extends State<ViewProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          languageProvider.localizedStrings['Edit Profile'] ?? "Edit Profile",
+          languageProvider.localizedStrings['View Profile'] ?? "View Profile",
           style: GoogleFonts.poppins(
               fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
         ),

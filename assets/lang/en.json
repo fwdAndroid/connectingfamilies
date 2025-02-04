@@ -83,6 +83,9 @@
     "Yes":"Yes",
     "Oh No, You are leaving":"Oh No, You are leaving",
     "Are you sure you want to logout?":"Are you sure you want to logout?",
-    "Logout Successfully":"Logout Successfully"
-    
+    "Logout Successfully":"Logout Successfully",
+    "View Profile":"View Profile",
+    "Edit Nutrition & Parenting Style":"Edit Nutrition & Parenting Style",
+    "Edit Interest":"Edit Interest",
+    "Update Profile": "Update Profile"
 }

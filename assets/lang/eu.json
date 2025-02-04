@@ -82,5 +82,9 @@
     "Yes": "Bai",
     "Oh No, You are leaving": "Oharra, Irtenar zaude",
     "Are you sure you want to logout?": "Ziur saioa itxi nahi duzula?",
-    "Logout Successfully": "Saioa arrakastaz itxi da"
+    "Logout Successfully": "Saioa arrakastaz itxi da",
+    "View Profile":"Ikusi Profila",
+    "Edit Nutrition & Parenting Style":"Editatu Elikadura eta Gurasoen Estiloa",
+    "Edit Interest":"Editar intereses",
+    "Update Profile": "Eguneratu Profila"
 }

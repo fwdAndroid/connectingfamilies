@@ -82,5 +82,9 @@
     "Yes": "Oui",
     "Oh No, You are leaving": "Oh non, vous partez",
     "Are you sure you want to logout?": "Êtes-vous sûr de vouloir vous déconnecter ?",
-    "Logout Successfully": "Déconnexion réussie"
+    "Logout Successfully": "Déconnexion réussie",
+    "View Profile":"Voir le Profil",
+    "Edit Nutrition & Parenting Style":"Modifier la Nutrition et le Style Parental",
+    "Edit Interest":"Modifier les Intérêts",
+    "Update Profile": "Mettre à Jour le Profil"
 }
