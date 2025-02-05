@@ -234,20 +234,20 @@ class _EditProfileState extends State<EditProfile> {
                               "Edit Interest",
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SaveButton(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) => EditFamily()));
-                      },
-                      title: languageProvider
-                              .localizedStrings['Edit Family Member'] ??
-                          "Edit Family Member",
-                    ),
-                  )
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: SaveButton(
+                  //     onTap: () {
+                  //       Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //               builder: (builder) => EditFamily()));
+                  //     },
+                  //     title: languageProvider
+                  //             .localizedStrings['Edit Family Member'] ??
+                  //         "Edit Family Member",
+                  //   ),
+                  // )
                 ],
               ),
             ),

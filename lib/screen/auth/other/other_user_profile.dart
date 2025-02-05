@@ -13,7 +13,6 @@ class OtherUserProfile extends StatefulWidget {
   final String photo;
   final String fullName;
   final String email;
-  final String dateofBirth;
   final String location;
   final List<dynamic> nutritions;
   final List<dynamic> parentingStyle;
@@ -34,7 +33,6 @@ class OtherUserProfile extends StatefulWidget {
     required this.familyType,
     required this.fullName,
     required this.location,
-    required this.dateofBirth,
     required this.interest,
     required this.familyDescription,
     required this.nutritions,
@@ -282,20 +280,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                     languageProvider.localizedStrings['Date of Birth'] ??
                         'Date of Birth'),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildInfoContainer(widget.dateofBirth),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildSectionTitle(
-                    languageProvider.localizedStrings['Special Situation'] ??
-                        'Special Situation'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildTag(widget.specialSituation),
-              ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _buildSectionTitle(

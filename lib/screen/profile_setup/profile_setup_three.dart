@@ -187,9 +187,6 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                           });
 
                           // Show success message or navigate
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Registration Complete')),
-                          );
                         }))
           ],
         )

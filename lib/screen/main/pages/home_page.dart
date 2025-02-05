@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> {
                                   email: snap['email'] ?? "",
                                   familyType: snap['familyType'] ?? "",
                                   location: snap['location'] ?? "",
-                                  dateofBirth: snap['dateofBirth'] ?? "",
                                   specialSituation:
                                       snap['specialSituation'] ?? "",
                                   parentingStyle: snap['parentingStyle'] ??
@@ -223,8 +222,6 @@ class _HomePageState extends State<HomePage> {
                                                       data['favorite'] ?? [],
                                                   location:
                                                       data['location'] ?? "",
-                                                  dateofBirth:
-                                                      data['dateofBirth'] ?? "",
                                                   specialSituation: data[
                                                           'specialSituation'] ??
                                                       "",

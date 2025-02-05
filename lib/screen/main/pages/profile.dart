@@ -10,7 +10,6 @@ class UserProfilePage extends StatefulWidget {
   final String photo;
   final String fullName;
   final String email;
-  final String dateofBirth;
   final String location;
   final List<dynamic> nutritions;
   final List<dynamic> parentingStyle;
@@ -29,7 +28,6 @@ class UserProfilePage extends StatefulWidget {
       required this.familyType,
       required this.fullName,
       required this.location,
-      required this.dateofBirth,
       required this.interest,
       required this.familyDescription,
       required this.nutritions,
@@ -141,14 +139,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       languageProvider.localizedStrings['Family Type'] ??
                           'Family Type'),
                   _buildInfoContainer(widget.familyType),
-                  _buildSectionTitle(
-                      languageProvider.localizedStrings['Date of Birth'] ??
-                          'Date of Birth'),
-                  _buildInfoContainer(widget.dateofBirth),
-                  _buildSectionTitle(
-                      languageProvider.localizedStrings['Special Situation'] ??
-                          'Special Situation'),
-                  _buildTag(widget.specialSituation),
+
                   _buildSectionTitle(
                       languageProvider.localizedStrings['Parenting Style'] ??
                           'Parenting Style'),

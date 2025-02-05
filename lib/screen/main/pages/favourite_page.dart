@@ -124,8 +124,7 @@ class _FavouritePageState extends State<FavouritePage> {
                                     photo: data['photo'],
                                     fullName: data['fullName'],
                                     email: data['email'],
-                                    dateofBirth: data['dateofBirth'] ??
-                                        '', // Provide default value if null
+
                                     location: data['location'] ??
                                         '', // Provide default value if null
                                     nutritions: data['nutritions'] ??
