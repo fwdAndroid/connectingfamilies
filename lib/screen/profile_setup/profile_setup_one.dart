@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:connectingfamilies/screen/profile_setup/profile_setup_two.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
-import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
@@ -62,48 +61,6 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
     "Asperger",
   ];
 
-  String countryValue = "";
-  String stateValue = "";
-  String cityValue = "";
-
-  DateTime? _selectedDate;
-
-  void _selectDate(BuildContext context) async {
-    DateTime currentDate = DateTime.now();
-    DateTime initialDate =
-        currentDate.subtract(Duration(days: 365 * 40)); // 100 years ago
-    DateTime firstDate =
-        currentDate.subtract(Duration(days: 365 * 120)); // 120 years ago
-    DateTime lastDate = currentDate.subtract(Duration(days: 365)); // 1 year ago
-
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
-  }
-
-  String _calculateAge() {
-    if (_selectedDate == null) return 'Age not selected';
-
-    DateTime now = DateTime.now();
-    int age = now.year - _selectedDate!.year;
-
-    if (now.month < _selectedDate!.month ||
-        (now.month == _selectedDate!.month && now.day < _selectedDate!.day)) {
-      age--;
-    }
-
-    return age.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -146,65 +103,26 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Location",
-                        style: GoogleFonts.poppins(
-                            color: black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                      ),
-                    ),
-                    SelectState(
-                      onCountryChanged: (value) {
-                        setState(() {
-                          countryValue = value;
-                        });
-                      },
-                      onStateChanged: (value) {
-                        setState(() {
-                          stateValue = value;
-                        });
-                      },
-                      onCityChanged: (value) {
-                        setState(() {
-                          cityValue = value;
-                        });
-                      },
+                    Text(
+                      "Location",
+                      style: GoogleFonts.poppins(
+                          color: black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14),
                     ),
                     TextFormField(
                       controller: locationController,
                       decoration: InputDecoration(
-                        hintText: 'Address',
+                        hintText: 'Location',
                         border: const OutlineInputBorder(),
                       ),
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () => _selectDate(context),
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'Select Birth Date',
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Text(
-                      _selectedDate == null
-                          ? 'Select a Date'
-                          : '${_selectedDate!.toLocal()}'.split(' ')[0],
-                    ),
-                  ),
-                ),
-              ),
+
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Age: ${_calculateAge()}'),
-              ),
+
               buildSpecialSituationsSection(), // Always visible
               if (showOthersField) buildOthersField(),
               buildNewMemberSection(),
@@ -218,14 +136,6 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Please enter a Address.')));
                     } else {
-                      String address = countryValue +
-                          " " +
-                          stateValue +
-                          " " +
-                          cityValue +
-                          " " +
-                          locationController.text;
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -240,7 +150,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                                     })
                                 .toList(),
                             email: widget.email,
-                            location: address,
+                            location: locationController.text,
                             password: widget.password,
                             phoneNumber: widget.phoneNumber,
                             specialSituation:
@@ -250,7 +160,6 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                                 descriptionController.text.trim(),
                             confirmPassword: widget.confirmPassword,
                             fullName: widget.fullName,
-                            dob: _calculateAge(),
                             familyType: dropdownValue,
                           ),
                         ),

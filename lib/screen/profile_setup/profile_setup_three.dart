@@ -15,7 +15,6 @@ class ProfileSetupThree extends StatefulWidget {
   final String password;
   final String fullName;
   final String email;
-  final String dob;
   final String location;
   final String specialSituation;
   final String familyType;
@@ -30,7 +29,6 @@ class ProfileSetupThree extends StatefulWidget {
       required this.familyMembers,
       required this.nutrition,
       required this.parenting,
-      required this.dob,
       required this.email,
       required this.familyDescription,
       required this.location,
@@ -173,7 +171,6 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                             fullName: widget.fullName,
                             nutrition: widget.nutrition,
                             parenting: widget.parenting,
-                            dob: widget.dob,
                             email: widget.email,
                             familyDescription: widget.familyDescription,
                             location: widget.location,

@@ -16,7 +16,6 @@ class ProfileSetupTwo extends StatefulWidget {
   final String password;
   final String fullName;
   final String email;
-  final String dob;
   final String location;
   final String specialSituation;
   final String familyType;
@@ -26,7 +25,6 @@ class ProfileSetupTwo extends StatefulWidget {
       required this.image,
       required this.confirmPassword,
       required this.fullName,
-      required this.dob,
       required this.familyMembers,
       required this.email,
       required this.familyDescription,
@@ -247,7 +245,6 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                                   familyDescription: widget.familyDescription,
                                   confirmPassword: widget.confirmPassword,
                                   fullName: widget.fullName,
-                                  dob: widget.dob,
                                   familyType: widget.familyType,
                                 )));
                   }),
