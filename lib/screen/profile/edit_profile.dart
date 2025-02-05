@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/main/main_dashboard.dart';
+import 'package:connectingfamilies/screen/profile/edit_family.dart';
 import 'package:connectingfamilies/screen/profile/edit_interest.dart';
 import 'package:connectingfamilies/screen/profile/edit_nutrition.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
@@ -238,6 +239,20 @@ class _EditProfileState extends State<EditProfile> {
                       title:
                           languageProvider.localizedStrings['Edit Interest'] ??
                               "Edit Interest",
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SaveButton(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => EditFamily()));
+                      },
+                      title: languageProvider
+                              .localizedStrings['Edit Family Member'] ??
+                          "Edit Family Member",
                     ),
                   )
                 ],

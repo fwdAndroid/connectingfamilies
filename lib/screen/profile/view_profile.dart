@@ -230,6 +230,7 @@ class _ViewProfileState extends State<ViewProfile> {
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profile image section
                   Padding(
@@ -278,77 +279,87 @@ class _ViewProfileState extends State<ViewProfile> {
                   buildTextField('Age', _ageController, 'Enter your age'),
                   // Gender field
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        languageProvider.localizedStrings['Interests'] ??
-                            "Interests",
-                        style: TextStyle(
-                            color: black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        children: interests
-                            .map((item) => Chip(
-                                  label: Text(
-                                    item,
-                                    style: TextStyle(color: colorWhite),
-                                  ),
-                                  backgroundColor: firstMainColor,
-                                ))
-                            .toList(),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          languageProvider.localizedStrings['Interests'] ??
+                              "Interests",
+                          style: TextStyle(
+                              color: black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Wrap(
+                          children: interests
+                              .map((item) => Chip(
+                                    label: Text(
+                                      item,
+                                      style: TextStyle(color: colorWhite),
+                                    ),
+                                    backgroundColor: firstMainColor,
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        languageProvider.localizedStrings['Parenting Style'] ??
-                            "Parenting Style",
-                        style: TextStyle(
-                            color: black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        children: parenting
-                            .map((item) => Chip(
-                                  label: Text(
-                                    item,
-                                    style: TextStyle(color: colorWhite),
-                                  ),
-                                  backgroundColor: firstMainColor,
-                                ))
-                            .toList(),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          languageProvider
+                                  .localizedStrings['Parenting Style'] ??
+                              "Parenting Style",
+                          style: TextStyle(
+                              color: black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Wrap(
+                          children: parenting
+                              .map((item) => Chip(
+                                    label: Text(
+                                      item,
+                                      style: TextStyle(color: colorWhite),
+                                    ),
+                                    backgroundColor: firstMainColor,
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        languageProvider.localizedStrings['Nutrition'] ??
-                            "Nutrition",
-                        style: TextStyle(
-                            color: black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        children: nutrition
-                            .map((item) => Chip(
-                                  label: Text(
-                                    item,
-                                    style: TextStyle(color: colorWhite),
-                                  ),
-                                  backgroundColor: firstMainColor,
-                                ))
-                            .toList(),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          languageProvider.localizedStrings['Nutrition'] ??
+                              "Nutrition",
+                          style: TextStyle(
+                              color: black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Wrap(
+                          children: nutrition
+                              .map((item) => Chip(
+                                    label: Text(
+                                      item,
+                                      style: TextStyle(color: colorWhite),
+                                    ),
+                                    backgroundColor: firstMainColor,
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -439,17 +450,21 @@ class _ViewProfileState extends State<ViewProfile> {
                       },
                     ),
                   ),
-                  TextButton(
-                      onPressed: () {
-                        showDialog<void>(
-                          context: context,
-                          barrierDismissible: false, // user must tap button!
-                          builder: (BuildContext context) {
-                            return DeleteWidget();
-                          },
-                        );
-                      },
-                      child: Text("Delete Account"))
+                  Center(
+                    child: TextButton(
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            barrierDismissible: false, // user must tap button!
+                            builder: (BuildContext context) {
+                              return DeleteWidget();
+                            },
+                          );
+                        },
+                        child: Text(languageProvider
+                                .localizedStrings['Delete Account'] ??
+                            "Delete Account")),
+                  )
                 ],
               ),
             ),
