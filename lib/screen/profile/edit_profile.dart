@@ -31,8 +31,6 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
-  TextEditingController _ageController =
-      TextEditingController(); // Added for Age
 
   // Profile image
   File? _profileImage;
@@ -66,7 +64,6 @@ class _EditProfileState extends State<EditProfile> {
         _descriptionController.text = data['familyDescription'] ?? '';
         _phoneController.text = data['phoneNumber'] ?? '';
         _locationController.text = data['location'] ?? '';
-        _ageController.text = data['dateofBirth']?.toString() ?? ''; // Set Age
         profileImageUrl = data['photo'] ?? null;
       }
     } catch (e) {
@@ -102,7 +99,6 @@ class _EditProfileState extends State<EditProfile> {
         'familyDescription': _descriptionController.text,
         'phoneNumber': _phoneController.text,
         'location': _locationController.text,
-        'age': _ageController.text,
         'photo': profileImageUrl,
       });
 
@@ -196,9 +192,6 @@ class _EditProfileState extends State<EditProfile> {
                   // Location field
                   buildTextField(
                       'Location', _locationController, 'Enter your location'),
-                  // Age field
-                  buildTextField('Age', _ageController, 'Enter your age'),
-                  // Gender field
 
                   SizedBox(height: 20),
                   // Save Button

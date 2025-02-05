@@ -95,7 +95,6 @@ class _ViewProfileState extends State<ViewProfile> {
         _descriptionController.text = data['familyDescription'] ?? '';
         _phoneController.text = data['phoneNumber'] ?? '';
         _locationController.text = data['location'] ?? '';
-        _ageController.text = data['dateofBirth']?.toString() ?? ''; // Set Age
         dropDownSpecial = data['specialSituation'] ?? 'Wheel Chair';
         profileImageUrl = data['photo'] ?? null;
 
@@ -275,9 +274,6 @@ class _ViewProfileState extends State<ViewProfile> {
                   // Location field
                   buildTextField(
                       'Location', _locationController, 'Enter your location'),
-                  // Age field
-                  buildTextField('Age', _ageController, 'Enter your age'),
-                  // Gender field
 
                   Padding(
                     padding: const EdgeInsets.all(8.0),
