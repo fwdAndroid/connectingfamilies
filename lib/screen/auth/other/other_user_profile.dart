@@ -262,16 +262,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildSectionTitle(
-                    languageProvider.localizedStrings['Family Type'] ??
-                        'Family Type'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildInfoContainer(widget.familyType),
-              ),
 
               Padding(
                 padding: const EdgeInsets.all(8.0),

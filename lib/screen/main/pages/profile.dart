@@ -135,10 +135,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  _buildSectionTitle(
-                      languageProvider.localizedStrings['Family Type'] ??
-                          'Family Type'),
-                  _buildInfoContainer(widget.familyType),
+                  // _buildSectionTitle(
+                  //     languageProvider.localizedStrings['Family Type'] ??
+                  //         'Family Type'),
+                  // _buildInfoContainer(widget.familyType),
 
                   _buildSectionTitle(
                       languageProvider.localizedStrings['Parenting Style'] ??
