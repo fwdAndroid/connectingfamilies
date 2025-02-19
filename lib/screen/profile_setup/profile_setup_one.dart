@@ -35,7 +35,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   final TextEditingController othersController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   TextEditingController locationController = TextEditingController();
-  String dropdownValue = 'Woman';
+  String dropdownValue = 'Male';
   String selectedSpecialSituation = '';
   bool showOthersField = false;
 
@@ -44,11 +44,11 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
   final TextEditingController newMemberAgeController = TextEditingController();
 
   // Gender list for members
-  String memberGender = 'Woman'; // Default gender when adding a new member
+  String memberGender = 'Male'; // Default gender when adding a new member
 
   // Manage members data
   List<Member> members = [];
-  final List<String> items = ['Woman', 'Man', 'Boy', 'Girl'];
+  final List<String> items = ['Male', 'Female'];
 
   // Special situations options list
   List<String> specialSituations = [
@@ -312,7 +312,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                     ));
                     newMemberNameController.clear();
                     newMemberAgeController.clear();
-                    memberGender = 'Woman'; // Reset to default gender
+                    memberGender = 'Male'; // Reset to default gender
                     selectedSpecialSituation = '';
                     showOthersField = false;
                     othersController.clear();

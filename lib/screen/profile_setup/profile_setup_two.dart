@@ -50,26 +50,26 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
   List<String> selectedParentingSituations = [];
 
   List<String> nutritionsList = [
-    "Non Vegan", // Changed to a more descriptive value
     "Cycling", // Changed to a more descriptive value
+    "Gluten Free",
+    "Non Vegan", // Changed to a more descriptive valueS
     "NSFA", // Changed to a more descriptive value
+    "Pork free",
+    "Sugar Free",
     "Ultra-Processed Foods Free",
     "Vegan",
     "Vegetarian",
-    "Gluten Free",
-    "Sugar Free",
-    "Pork free",
     "Others",
   ];
 
   List<String> parentingList = [
+    "A Slap in Time",
     "Avoid using electronic devices",
     "Free use of electronic devices",
     "Moderate use of electronic devices",
-    "Respectful Parenting",
-    "A Slap in Time",
-    "Never Slap in Time",
     "My children have Phone",
+    "Never Slap in Time",
+    "Respectful Parenting",
     "Others",
   ];
 
@@ -199,8 +199,8 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    selectedParentingSituations
-                        .join(', '), // Display selected list as a string
+                    (selectedParentingSituations.toList()..sort())
+                        .join(', '), // Sorted
                     style: GoogleFonts.poppins(color: black),
                   ),
                   SizedBox(height: 20),
@@ -214,8 +214,8 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    selectedNutritionSituations
-                        .join(', '), // Display selected list as a string
+                    (selectedNutritionSituations.toList()..sort())
+                        .join(', '), // Sorted
                     style: GoogleFonts.poppins(color: black),
                   ),
                 ],

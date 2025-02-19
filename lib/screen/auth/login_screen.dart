@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 30),
                 Image.asset("assets/logo.png",
-                    height: 104, width: 104, fit: BoxFit.cover),
+                    height: 124, width: 104, fit: BoxFit.cover),
                 Column(
                   children: [
                     Text(
@@ -387,7 +387,7 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(
               "assets/m.png",
-              height: 104,
+              height: 84,
               width: 104,
             ),
           ),
