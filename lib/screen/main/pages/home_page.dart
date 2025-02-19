@@ -19,6 +19,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController _emailController = TextEditingController();
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  Map<String, dynamic> _currentUserData = {};
+
   String _searchText = '';
   List<dynamic> _favorites = [];
   @override
@@ -37,6 +40,7 @@ class _HomePageState extends State<HomePage> {
       if (doc.exists) {
         setState(() {
           _favorites = doc['favorite'] ?? [];
+          _currentUserData = doc.data() ?? {};
         });
       }
     });
@@ -162,10 +166,28 @@ class _HomePageState extends State<HomePage> {
 
                   // Filter the users based on search input
                   final filteredDocs = snapshot.data!.docs.where((doc) {
-                    final fullName = (doc.data()
-                        as Map<String, dynamic>)['fullName'] as String;
-                    return fullName.toLowerCase().contains(
-                        _searchText.toLowerCase()); // Convert both to lowercase
+                    final data = doc.data() as Map<String, dynamic>;
+
+                    // 1. Search filter
+                    final searchLower = _searchText.toLowerCase();
+                    final matchesSearch = [
+                      data['fullName']?.toString().toLowerCase() ?? '',
+                    ].any((field) => field.contains(searchLower));
+
+                    // 2. Blocking filter (NEW IMPROVED VERSION)
+                    final blockedUsers = List<String>.from(
+                        data['blocked']?.map((e) => e.toString()) ?? []);
+                    final currentUserIsBlocked =
+                        blockedUsers.contains(currentUserId);
+
+                    // 3. Reverse blocking filter (NEW ADDITION)
+                    final myBlockedUsers =
+                        List<String>.from(_currentUserData['blocked'] ?? []);
+                    final iHaveBlockedThisUser =
+                        myBlockedUsers.contains(data['uuid']);
+                    return matchesSearch &&
+                        !currentUserIsBlocked &&
+                        !iHaveBlockedThisUser;
                   }).toList();
 
                   if (filteredDocs.isEmpty) {
