@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectingfamilies/screen/main/main_dashboard.dart';
 import 'package:connectingfamilies/service/storage.dart';
 import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/uitls/image_picker.dart';
@@ -111,72 +112,56 @@ class _ReportAccountState extends State<ReportAccount> {
             Spacer(), // Push the send button to the bottom
             // Send button
             SizedBox(
-              width: double.infinity,
-              height: size.height * 0.08, // Responsive button height
-              child: SaveButton(
-                onTap: () async {
-                  if (_messageController.text.isEmpty) {
-                    showMessageBar("Text is Required", context);
-                  } else {
-                    setState(() {
-                      isloading =
-                          true; // Show the spinner when starting the upload
-                    });
+                width: double.infinity,
+                height: size.height * 0.08, // Responsive button height
+                child: SaveButton(
+                  onTap: isloading
+                      ? null
+                      : () async {
+                          // Disable button when loading
+                          if (_messageController.text.isEmpty) {
+                            showMessageBar("Text is Required", context);
+                          } else {
+                            setState(() {
+                              isloading = true;
+                            });
 
-                    // Attempt to upload image only if it's selected
-                    String photo = image != null
-                        ? await StorageMethods()
-                            .uploadImageToStorage("childName", image!)
-                        : "";
+                            String photo = image != null
+                                ? await StorageMethods()
+                                    .uploadImageToStorage("childName", image!)
+                                : "";
 
-                    // Attempt Firestore upload
-                    try {
-                      await FirebaseFirestore.instance
-                          .collection("report")
-                          .doc(uuid)
-                          .set({
-                        "uuid": uuid,
-                        "message": _messageController.text,
-                        "image": photo,
-                      });
-
-                      // Ensure the widget is still mounted before showing the dialog
-                      if (!mounted) return;
-
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Complaint Sent"),
-                            content: Text("Your complaint has been sent."),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // Close dialog
-                                  Navigator.pop(
-                                      context); // Return to previous screen
-                                },
-                                child: Text("OK"),
-                              ),
-                            ],
-                          );
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection("report")
+                                  .doc(uuid)
+                                  .set({
+                                "uuid": uuid,
+                                "message": _messageController.text,
+                                "image": photo,
+                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => MainDashboard()));
+                              showMessageBar("Report Send", context);
+                              if (!mounted) return;
+                            } catch (e) {
+                              showMessageBar(
+                                  "Error sending complaint. Please try again.",
+                                  context);
+                            } finally {
+                              setState(() {
+                                isloading = false;
+                              });
+                            }
+                          }
                         },
-                      );
-                    } catch (e) {
-                      showMessageBar(
-                          "Error sending complaint. Please try again.",
-                          context);
-                    } finally {
-                      setState(() {
-                        isloading = false; // Hide the spinner after completion
-                      });
-                    }
-                  }
-                },
-                title: languageProvider.localizedStrings['Send Report'] ??
-                    "Send Report",
-              ),
-            ),
+                  title: isloading
+                      ? "Sending..."
+                      : languageProvider.localizedStrings['Send Report'] ??
+                          "Send Report",
+                )),
           ],
         ),
       ),

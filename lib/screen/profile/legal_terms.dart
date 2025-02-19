@@ -70,20 +70,6 @@ class _LegalTermsScreenState extends State<LegalTermsScreen> {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final size = MediaQuery.of(context).size;
 
-    if (!isAccepted) {
-      // If terms are not accepted, prevent the user from interacting further
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(languageProvider.localizedStrings['Legal Terms'] ??
-              'Legal Terms'),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
