@@ -3,7 +3,7 @@ import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/main/pages/favourite_page.dart';
 import 'package:connectingfamilies/screen/profile/blocked_users.dart';
 import 'package:connectingfamilies/screen/profile/change_langage.dart';
-import 'package:connectingfamilies/screen/profile/view_profile.dart';
+import 'package:connectingfamilies/screen/profile/edit_profile.dart';
 import 'package:connectingfamilies/screen/profile/help&support.dart';
 import 'package:connectingfamilies/screen/profile/legal_terms.dart';
 import 'package:connectingfamilies/screen/profile/notifcation.dart';
@@ -210,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => ViewProfile()));
+                    MaterialPageRoute(builder: (builder) => EditProfile()));
               },
               trailing: Icon(
                 Icons.keyboard_arrow_right,
