@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/provider/language_provider.dart';
 import 'package:connectingfamilies/screen/chat/chat_message.dart';
+import 'package:connectingfamilies/screen/main/main_dashboard.dart';
 import 'package:connectingfamilies/screen/profile/report_account.dart';
+import 'package:connectingfamilies/uitls/colors.dart';
 import 'package:connectingfamilies/widget/save_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class OtherUserProfile extends StatefulWidget {
   final String photo;
@@ -47,7 +49,7 @@ class OtherUserProfile extends StatefulWidget {
 
 class _OtherUserProfileState extends State<OtherUserProfile> {
   late bool isFavorite = false;
-
+  bool isBlocked = false;
   @override
   void initState() {
     super.initState();
@@ -121,11 +123,8 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final languageProvider = Provider.of<LanguageProvider>(context);
-
-    var uuid1 = Uuid().v4();
 
     return SafeArea(
       child: Scaffold(
@@ -211,7 +210,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                                                 'No data available'] ??
                                             'No data available'));
                               }
-                              var snap = snapshot.data;
                               return GestureDetector(
                                 onTap: () => initiateChat(context),
                                 child: CircleAvatar(
@@ -273,12 +271,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _buildInfoContainer(widget.familyType),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildSectionTitle(
-                    languageProvider.localizedStrings['Date of Birth'] ??
-                        'Date of Birth'),
               ),
 
               Padding(
@@ -349,8 +341,17 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                           MaterialPageRoute(
                               builder: (builder) => ReportAccount()));
                     }),
-              )
+              ),
               // Profile Details (List of Interests, Family, etc.)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SaveButton(
+                    title: languageProvider.localizedStrings['Block Users'] ??
+                        "Block User",
+                    onTap: () {
+                      blockUser();
+                    }),
+              )
             ],
           ),
         ),
@@ -408,23 +409,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
     );
   }
 
-  Widget _buildTag(String text) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [Colors.pink, Colors.purple],
-        ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
   Widget _buildChip(String label) {
     return Chip(
       label: Text(
@@ -433,5 +417,37 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
       ),
       backgroundColor: Colors.purple,
     );
+  }
+
+  Future<void> blockUser() async {
+    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    try {
+      final userDoc =
+          FirebaseFirestore.instance.collection("users").doc(currentUserId);
+
+      await userDoc.update({
+        "blocked": FieldValue.arrayUnion([widget.uuid]),
+      });
+
+      setState(() {
+        isBlocked = true;
+      });
+
+      Fluttertoast.showToast(
+        backgroundColor: firstMainColor,
+        msg: "${widget.fullName} has been blocked",
+        textColor: Colors.white,
+      );
+      Navigator.push(
+          context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+    } catch (e) {
+      print("Error blocking user: $e");
+      Fluttertoast.showToast(
+        backgroundColor: Colors.red,
+        msg: "Failed to block user",
+        textColor: Colors.white,
+      );
+    }
   }
 }

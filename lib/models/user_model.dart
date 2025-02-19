@@ -17,6 +17,7 @@ class UserModel {
   final interest;
   String fullName;
   var familyMembers;
+  List<String> blocked;
 
   UserModel({
     required this.uuid,
@@ -35,6 +36,7 @@ class UserModel {
     required this.parentingStyle,
     this.photo,
     required this.nutritions,
+    required this.blocked,
   });
 
   ///Converting OBject into Json Object
@@ -54,6 +56,7 @@ class UserModel {
         'nutritions': nutritions,
         'familyMembers': familyMembers,
         'interest': interest,
+        'blocked': blocked,
         'fullName': fullName,
       };
 
@@ -70,6 +73,7 @@ class UserModel {
       confrimPassword: snapshot['confrimPassword'],
       phoneNumber: snapshot['phoneNumber'],
       location: snapshot['location'],
+      blocked: snapshot['blocked'],
       familyDescription: snapshot['familyDescription'],
       specialSituation: snapshot['specialSituation'],
       parentingStyle: snapshot['parentingStyle'],

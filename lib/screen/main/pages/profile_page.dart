@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectingfamilies/screen/auth/forgot/forgot_password.dart';
 import 'package:connectingfamilies/screen/main/pages/favourite_page.dart';
-import 'package:connectingfamilies/screen/main/pages/webpage.dart';
+import 'package:connectingfamilies/screen/profile/blocked_users.dart';
 import 'package:connectingfamilies/screen/profile/change_langage.dart';
 import 'package:connectingfamilies/screen/profile/view_profile.dart';
 import 'package:connectingfamilies/screen/profile/help&support.dart';
@@ -220,6 +220,29 @@ class _ProfilePageState extends State<ProfilePage> {
               title: Text(
                 languageProvider.localizedStrings['Edit Profile'] ??
                     "Edit Profile",
+                style: GoogleFonts.poppins(
+                  color: black,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Image.asset(
+                "assets/questions.png",
+                width: 40,
+                height: 40,
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => BlockedUsers()));
+              },
+              trailing: Icon(
+                Icons.keyboard_arrow_right,
+                color: textColor,
+                size: 40,
+              ),
+              title: Text(
+                languageProvider.localizedStrings['Block User'] ?? "Block User",
                 style: GoogleFonts.poppins(
                   color: black,
                   fontSize: 16,

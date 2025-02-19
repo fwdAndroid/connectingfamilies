@@ -66,6 +66,7 @@ class DatabaseMethods {
             parentingStyle: parenting,
             phoneNumber: phoneNumber,
             favorite: [],
+            blocked: [],
             confrimPassword: confirmPassword,
             location: location,
             interest: interest,
