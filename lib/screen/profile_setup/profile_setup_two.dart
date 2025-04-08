@@ -20,11 +20,14 @@ class ProfileSetupTwo extends StatefulWidget {
   final String specialSituation;
   final String familyType;
   final List<Map<String, String>> familyMembers;
+  final String genders;
+
   ProfileSetupTwo(
       {super.key,
       required this.image,
       required this.confirmPassword,
       required this.fullName,
+      required this.genders,
       required this.familyMembers,
       required this.email,
       required this.familyDescription,
@@ -233,20 +236,20 @@ class _ProfileSetupTwoState extends State<ProfileSetupTwo> {
                         context,
                         MaterialPageRoute(
                             builder: (builder) => ProfileSetupThree(
-                                  familyMembers: widget.familyMembers,
-                                  email: widget.email,
-                                  parenting: selectedParentingSituations,
-                                  nutrition: selectedNutritionSituations,
-                                  location: widget.location,
-                                  password: widget.password,
-                                  phoneNumber: widget.phoneNumber,
-                                  specialSituation: widget.specialSituation,
-                                  image: widget.image,
-                                  familyDescription: widget.familyDescription,
-                                  confirmPassword: widget.confirmPassword,
-                                  fullName: widget.fullName,
-                                  familyType: widget.familyType,
-                                )));
+                                familyMembers: widget.familyMembers,
+                                email: widget.email,
+                                parenting: selectedParentingSituations,
+                                nutrition: selectedNutritionSituations,
+                                location: widget.location,
+                                password: widget.password,
+                                phoneNumber: widget.phoneNumber,
+                                specialSituation: widget.specialSituation,
+                                image: widget.image,
+                                familyDescription: widget.familyDescription,
+                                confirmPassword: widget.confirmPassword,
+                                fullName: widget.fullName,
+                                familyType: widget.familyType,
+                                genders: widget.genders)));
                   }),
             ),
           ],

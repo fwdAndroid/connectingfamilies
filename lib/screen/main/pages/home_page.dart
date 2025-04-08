@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   String _searchText = '';
   List<dynamic> _favorites = [];
+
   @override
   void initState() {
     super.initState();
@@ -120,7 +121,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   suffixIcon: IconButton(
                     onPressed: () {
-                      // Handle filter action
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -164,23 +164,18 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
 
-                  // Filter the users based on search input
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
-
-                    // 1. Search filter
                     final searchLower = _searchText.toLowerCase();
                     final matchesSearch = [
                       data['fullName']?.toString().toLowerCase() ?? '',
                     ].any((field) => field.contains(searchLower));
 
-                    // 2. Blocking filter (NEW IMPROVED VERSION)
                     final blockedUsers = List<String>.from(
                         data['blocked']?.map((e) => e.toString()) ?? []);
                     final currentUserIsBlocked =
                         blockedUsers.contains(currentUserId);
 
-                    // 3. Reverse blocking filter (NEW ADDITION)
                     final myBlockedUsers =
                         List<String>.from(_currentUserData['blocked'] ?? []);
                     final iHaveBlockedThisUser =
@@ -214,6 +209,14 @@ class _HomePageState extends State<HomePage> {
                           filteredDocs[index].data() as Map<String, dynamic>;
                       String userUid = data['uuid'];
                       bool isFavorite = _favorites.contains(userUid);
+
+                      // Determine gender icon based on genders field
+                      final gender =
+                          data['genders']?.toString().toLowerCase() ?? '';
+                      final isMale = gender == 'male' || gender == 'boy';
+                      final genderIcon = isMale ? Icons.male : Icons.female;
+                      final genderColor = isMale ? Colors.blue : Colors.pink;
+
                       return Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
@@ -281,7 +284,6 @@ class _HomePageState extends State<HomePage> {
                                   right: 8,
                                   child: GestureDetector(
                                     onTap: () async {
-                                      // Toggle favorite status
                                       setState(() {
                                         if (isFavorite) {
                                           _favorites.remove(userUid);
@@ -289,7 +291,6 @@ class _HomePageState extends State<HomePage> {
                                           _favorites.add(userUid);
                                         }
                                       });
-                                      // Update the favorites list in the current user's document
                                       await FirebaseFirestore.instance
                                           .collection("users")
                                           .doc(FirebaseAuth
@@ -307,7 +308,12 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             SizedBox(height: 8),
-                            Icon(Icons.more_horiz),
+                            // Gender icon with color
+                            Icon(
+                              genderIcon,
+                              color: genderColor,
+                              size: 24,
+                            ),
                             SizedBox(height: 4),
                             Text(
                               data['fullName'],

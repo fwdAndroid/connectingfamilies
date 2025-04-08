@@ -17,6 +17,7 @@ class UserModel {
   final interest;
   String fullName;
   var familyMembers;
+  String genders;
   List<String> blocked;
 
   UserModel({
@@ -26,6 +27,7 @@ class UserModel {
     required this.password,
     required this.phoneNumber,
     required this.confrimPassword,
+    required this.genders,
     required this.interest,
     required this.favorite,
     required this.familyMembers,
@@ -58,6 +60,7 @@ class UserModel {
         'interest': interest,
         'blocked': blocked,
         'fullName': fullName,
+        'genders': genders,
       };
 
   ///
@@ -65,23 +68,23 @@ class UserModel {
     var snapshot = snaps.data() as Map<String, dynamic>;
 
     return UserModel(
-      photo: snapshot['photo'],
-      familyMembers: snapshot['familyMembers'],
-      email: snapshot['email'],
-      uuid: snapshot['uuid'],
-      password: snapshot['password'],
-      confrimPassword: snapshot['confrimPassword'],
-      phoneNumber: snapshot['phoneNumber'],
-      location: snapshot['location'],
-      blocked: snapshot['blocked'],
-      familyDescription: snapshot['familyDescription'],
-      specialSituation: snapshot['specialSituation'],
-      parentingStyle: snapshot['parentingStyle'],
-      familyType: snapshot['familyType'],
-      favorite: snapshot['favorite'],
-      nutritions: snapshot['nutritions'],
-      interest: snapshot['interest'],
-      fullName: snapshot['fullName'],
-    );
+        photo: snapshot['photo'],
+        familyMembers: snapshot['familyMembers'],
+        email: snapshot['email'],
+        uuid: snapshot['uuid'],
+        password: snapshot['password'],
+        confrimPassword: snapshot['confrimPassword'],
+        phoneNumber: snapshot['phoneNumber'],
+        location: snapshot['location'],
+        blocked: snapshot['blocked'],
+        familyDescription: snapshot['familyDescription'],
+        specialSituation: snapshot['specialSituation'],
+        parentingStyle: snapshot['parentingStyle'],
+        familyType: snapshot['familyType'],
+        favorite: snapshot['favorite'],
+        nutritions: snapshot['nutritions'],
+        interest: snapshot['interest'],
+        fullName: snapshot['fullName'],
+        genders: snapshot['genders']);
   }
 }

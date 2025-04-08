@@ -21,11 +21,14 @@ class ProfileSetupThree extends StatefulWidget {
   final List<String> nutrition;
   final List<String> parenting;
   final List<Map<String, String>> familyMembers;
+  final String genders;
+
   ProfileSetupThree(
       {super.key,
       required this.image,
       required this.confirmPassword,
       required this.fullName,
+      required this.genders,
       required this.familyMembers,
       required this.nutrition,
       required this.parenting,
@@ -180,6 +183,7 @@ class _ProfileSetupThreeState extends State<ProfileSetupThree> {
                             phoneNumber: widget.phoneNumber,
                             specialSituation: widget.specialSituation,
                             file: widget.image,
+                            genders: widget.genders,
                           );
 
                           setState(() {

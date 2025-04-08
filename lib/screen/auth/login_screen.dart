@@ -298,51 +298,131 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginWithGoogle() async {
-    DatabaseMethods().signInWithGoogle().then((value) async {
+    try {
       setState(() {
         isGoogle = true;
       });
 
-      User? user = FirebaseAuth.instance.currentUser;
+      // Sign in with Google
+      await DatabaseMethods().signInWithGoogle().then((value) async {
+        User? user = FirebaseAuth.instance.currentUser;
 
-      await FirebaseFirestore.instance.collection("users").doc(user?.uid).set({
-        "photo": user?.photoURL?.toString(),
-        "email": user?.email,
-        "fullName": user?.displayName,
-        "phoneNumber": user?.phoneNumber ?? "Not Available",
-        "password": "No Password Available",
-        "familyDescription": "familyDescription",
-        "familyType": "Man",
-        "confrimPassword": "No Password Available",
-        "favorite": [],
-        "interest": ["Board Games", "Ball Park", "Pet Walks"],
-        "location": "Spain Madrid",
-        "familyMembers": [
-          {
-            "name": user?.displayName,
-            "gender": "Male",
-            "SpecialSituation": "Wheel Chair",
-            "age": "40"
-          }
-        ],
-        "nutritions": ["No Preference", "Cycling", "Vegetarian"],
-        "parentingStyle": [
-          "Moderate use of electronic devices",
-          "Respectful Parenting",
-          "Never Slap in Time"
-        ],
-        "specialSituation": "Autism",
-        "uuid": user!.uid,
+        // Show gender selection dialog
+        String? selectedGender = await showDialog<String>(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'How do you identify?',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildGenderOption('Male', Icons.man, 'Male'),
+                          _buildGenderOption('Boy', Icons.boy, 'Male'),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildGenderOption('Woman', Icons.woman, 'Female'),
+                          _buildGenderOption('Girl', Icons.girl, 'Female'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ));
+          },
+        );
+
+        // If user cancels the dialog, don't proceed
+        if (selectedGender == null) {
+          await FirebaseAuth.instance
+              .signOut(); // Sign out since they didn't complete registration
+          setState(() {
+            isGoogle = false;
+          });
+          return;
+        }
+
+        // Store user data in Firestore
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(user?.uid)
+            .set({
+          "photo": user?.photoURL?.toString(),
+          "genders": selectedGender, // Store the selected gender
+          "email": user?.email,
+          "fullName": user?.displayName,
+          "phoneNumber": user?.phoneNumber ?? "Not Available",
+          "password": "No Password Available",
+          "familyDescription": "familyDescription",
+          "familyType": selectedGender == 'Male'
+              ? "Man"
+              : "Woman", // Set familyType based on gender
+          "confrimPassword": "No Password Available",
+          "favorite": [],
+          "interest": ["Board Games", "Ball Park", "Pet Walks"],
+          "location": "Spain Madrid",
+          "familyMembers": [
+            {
+              "name": user?.displayName,
+              "gender": selectedGender, // Use the selected gender
+              "SpecialSituation": "Wheel Chair",
+              "age": "40"
+            }
+          ],
+          "nutritions": ["No Preference", "Cycling", "Vegetarian"],
+          "parentingStyle": [
+            "Moderate use of electronic devices",
+            "Respectful Parenting",
+            "Never Slap in Time"
+          ],
+          "specialSituation": "Autism",
+          "uuid": user!.uid,
+        });
+
+        _saveRememberMe();
+
+        setState(() {
+          isGoogle = false;
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (builder) => MainDashboard()));
+        });
       });
-
-      _saveRememberMe();
-
+    } catch (e) {
       setState(() {
         isGoogle = false;
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (builder) => MainDashboard()));
       });
-    });
+      showMessageBar("Error during Google Sign-In: ${e.toString()}", context);
+    }
+  }
+
+  Widget _buildGenderOption(String label, IconData icon, String value) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context, value),
+      child: Column(
+        children: [
+          Icon(icon, size: 40, color: firstMainColor),
+          SizedBox(height: 8),
+          Text(label, style: TextStyle(fontSize: 16)),
+        ],
+      ),
+    );
   }
 
   Widget _buildSignupLink(LanguageProvider languageProvider) {
@@ -356,7 +436,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Text.rich(TextSpan(
             text: languageProvider
                     .localizedStrings["Don't have an account? Sign up"] ??
-                'Don’t have an account? ',
+                "Don't have an account? ",
             children: <InlineSpan>[
               TextSpan(
                 text: languageProvider.localizedStrings['Sign Up'] ?? 'Sign Up',

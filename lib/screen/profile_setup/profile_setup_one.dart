@@ -15,6 +15,7 @@ class ProfileSetupOne extends StatefulWidget {
   final String password;
   final String fullName;
   final String email;
+  final String genders;
 
   ProfileSetupOne({
     Key? key,
@@ -24,6 +25,7 @@ class ProfileSetupOne extends StatefulWidget {
     required this.image,
     required this.password,
     required this.phoneNumber,
+    required this.genders,
   }) : super(key: key);
 
   @override
@@ -148,28 +150,28 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                         context,
                         MaterialPageRoute(
                           builder: (builder) => ProfileSetupTwo(
-                            familyMembers: members
-                                .map((member) => {
-                                      "name": member.name,
-                                      "age": member.age,
-                                      "gender": member.gender,
-                                      "specialSituation":
-                                          member.specialSituation
-                                    })
-                                .toList(),
-                            email: widget.email,
-                            location: locationController.text,
-                            password: widget.password,
-                            phoneNumber: widget.phoneNumber,
-                            specialSituation:
-                                selectedSpecialSituation ?? "Wheel Chair",
-                            image: widget.image,
-                            familyDescription:
-                                descriptionController.text.trim(),
-                            confirmPassword: widget.confirmPassword,
-                            fullName: widget.fullName,
-                            familyType: dropdownValue,
-                          ),
+                              familyMembers: members
+                                  .map((member) => {
+                                        "name": member.name,
+                                        "age": member.age,
+                                        "gender": member.gender,
+                                        "specialSituation":
+                                            member.specialSituation
+                                      })
+                                  .toList(),
+                              email: widget.email,
+                              location: locationController.text,
+                              password: widget.password,
+                              phoneNumber: widget.phoneNumber,
+                              specialSituation:
+                                  selectedSpecialSituation ?? "Wheel Chair",
+                              image: widget.image,
+                              familyDescription:
+                                  descriptionController.text.trim(),
+                              confirmPassword: widget.confirmPassword,
+                              fullName: widget.fullName,
+                              familyType: dropdownValue,
+                              genders: widget.genders),
                         ),
                       );
                     }

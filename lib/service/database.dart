@@ -34,6 +34,7 @@ class DatabaseMethods {
       required List<String> interest,
       required String phoneNumber,
       required String specialSituation,
+      required String genders,
       required Uint8List file,
       required List<Map<String, String>> familyMembers}) async {
     String res = 'An error occurred';
@@ -60,6 +61,7 @@ class DatabaseMethods {
           // Add User to the database with model
           UserModel userModel = UserModel(
             familyMembers: familyMembers,
+            genders: genders,
             familyType: familyType,
             photo: photoURL,
             uuid: cred.user!.uid,

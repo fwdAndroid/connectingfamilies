@@ -51,6 +51,11 @@ class _SignupScreenState extends State<SignupScreen> {
   Uint8List? image;
   String? phoneNumber;
 
+  String? selectedGender;
+  String? normalizedGender;
+
+  final List<String> genderOptions = ['Male', 'Boy', 'Woman', 'Girl'];
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
@@ -353,6 +358,56 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ],
               ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, left: 16),
+                    child: Align(
+                      alignment: AlignmentDirectional.topStart,
+                      child: Text(
+                        languageProvider.localizedStrings['Gender'] ?? 'Gender',
+                        style: GoogleFonts.poppins(
+                            color: black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: borderColor),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        hint: Text(
+                          'Select Gender',
+                          style:
+                              GoogleFonts.poppins(fontSize: 12, color: black),
+                        ),
+                        value: selectedGender,
+                        isExpanded: true,
+                        items: genderOptions.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 14, color: black)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedGender = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SaveButton(
@@ -392,7 +447,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         setState(() {
                           isLoading = true;
                         });
-
+                        String normalizedGender = (selectedGender == 'Women' ||
+                                selectedGender == 'Girl')
+                            ? 'Female'
+                            : 'Male';
                         if (_formKey.currentState?.validate() ?? false) {
                           Navigator.push(
                               context,
@@ -407,6 +465,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                         email: _emailController.text.trim(),
                                         confirmPassword:
                                             _reenterController.text.trim(),
+                                        genders: normalizedGender!,
+                                        // Add this to your next screen constructor
                                       )));
                         }
                       }
