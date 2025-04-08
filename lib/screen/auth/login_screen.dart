@@ -382,7 +382,7 @@ class _LoginScreenState extends State<LoginScreen> {
             {
               "name": user?.displayName,
               "gender": selectedGender, // Use the selected gender
-              "SpecialSituation": "Wheel Chair",
+              "specialSituation": "Wheel Chair",
               "age": "40"
             }
           ],

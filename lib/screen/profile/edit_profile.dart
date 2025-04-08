@@ -30,6 +30,11 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
+  int? editingIndex;
+  TextEditingController _editName = TextEditingController();
+  TextEditingController _editAge = TextEditingController();
+  TextEditingController _editGender = TextEditingController();
+  TextEditingController _editSpecial = TextEditingController();
 
   // Profile image
   File? _profileImage;
@@ -103,6 +108,7 @@ class _EditProfileState extends State<EditProfile> {
     "Take a Walk",
     "Traveling",
   ];
+  List<Map<String, dynamic>> familyMembers = [];
 
   @override
   void initState() {
@@ -137,6 +143,11 @@ class _EditProfileState extends State<EditProfile> {
         interest =
             userinterests is List ? List<String>.from(userinterests) : [];
         selectedInterest = List.from(interest);
+
+        var family = userDoc['familyMembers'];
+        if (family is List) {
+          familyMembers = List<Map<String, dynamic>>.from(family);
+        }
         _nameController.text = data['fullName'] ?? '';
         _descriptionController.text = data['familyDescription'] ?? '';
         _phoneController.text = data['phoneNumber'] ?? '';
@@ -342,7 +353,114 @@ class _EditProfileState extends State<EditProfile> {
                     buildOthersField(_ImController, selectedInterest, () {
                       setState(() => showOthersFieldIn = false);
                     }),
+                  if (familyMembers.isNotEmpty) ...[
+                    sectionHeader(
+                      languageProvider.localizedStrings['Edit Family Member'] ??
+                          "Edit Family Member",
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minWidth: constraints.maxWidth),
+                              child: DataTable(
+                                border: TableBorder.all(),
+                                columnSpacing: 10,
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => Colors.grey[200]!),
+                                columns: const [
+                                  DataColumn(label: Text("Name")),
+                                  DataColumn(label: Text("Age")),
+                                  DataColumn(label: Text("Gender")),
+                                  DataColumn(
+                                      label: Text(
+                                    "Special \n Situation",
+                                    textAlign: TextAlign.center,
+                                  )),
+                                  DataColumn(
+                                      label: Text("Action")), // NEW COLUMN
+                                ],
+                                rows: List.generate(familyMembers.length,
+                                    (index) {
+                                  final member = familyMembers[index];
+                                  final isEditing = editingIndex == index;
+
+                                  if (isEditing) {
+                                    _editName.text = member['name'] ?? '';
+                                    _editAge.text =
+                                        member['age']?.toString() ?? '';
+                                    _editGender.text = member['gender'] ?? '';
+                                    _editSpecial.text =
+                                        member['specialSituation'] ?? '';
+                                  }
+
+                                  return DataRow(cells: [
+                                    DataCell(isEditing
+                                        ? TextField(controller: _editName)
+                                        : Text(member['name'] ?? '')),
+                                    DataCell(isEditing
+                                        ? TextField(
+                                            controller: _editAge,
+                                            keyboardType: TextInputType.number)
+                                        : Text(
+                                            member['age']?.toString() ?? '')),
+                                    DataCell(isEditing
+                                        ? TextField(controller: _editGender)
+                                        : Text(member['gender'] ?? '')),
+                                    DataCell(isEditing
+                                        ? TextField(controller: _editSpecial)
+                                        : Text(
+                                            member['specialSituation'] ?? '')),
+                                    DataCell(
+                                      IconButton(
+                                        icon: Icon(isEditing
+                                            ? Icons.check
+                                            : Icons.edit),
+                                        onPressed: () async {
+                                          if (isEditing) {
+                                            // Save changes
+                                            setState(() {
+                                              familyMembers[index] = {
+                                                'name': _editName.text,
+                                                'age': _editAge.text,
+                                                'gender': _editGender.text,
+                                                'specialSituation':
+                                                    _editSpecial.text,
+                                              };
+                                              editingIndex = null;
+                                            });
+
+                                            // Update in Firestore
+                                            await _firestore
+                                                .collection('users')
+                                                .doc(userId)
+                                                .update({
+                                              'familyMembers': familyMembers,
+                                            });
+                                          } else {
+                                            setState(() {
+                                              editingIndex = index;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ]);
+                                }),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+
                   SizedBox(height: 20),
+
                   // Save Button
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -355,21 +473,6 @@ class _EditProfileState extends State<EditProfile> {
                       },
                     ),
                   ),
-
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: SaveButton(
-                  //     onTap: () {
-                  //       Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //               builder: (builder) => EditFamily()));
-                  //     },
-                  //     title: languageProvider
-                  //             .localizedStrings['Edit Family Member'] ??
-                  //         "Edit Family Member",
-                  //   ),
-                  // )
                 ],
               ),
             ),
