@@ -213,7 +213,7 @@ class _ProfileSetupOneState extends State<ProfileSetupOne> {
                 }
               });
             },
-            isRadio: true,
+            isRadio: false,
             buttons: specialSituations,
           ),
         ],

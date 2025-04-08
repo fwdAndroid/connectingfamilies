@@ -68,7 +68,7 @@ class _EditProfileState extends State<EditProfile> {
     "Free use of electronic devices",
     "My children have Phone",
     "Moderate use of electronic devices",
-    "Never Slap in Time",
+    "Never slap",
     "Others",
     "Respectful Parenting",
   ];

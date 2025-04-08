@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -226,6 +227,94 @@ class _ChatScreenState extends State<ChatScreen> {
     return "$minutes:$seconds";
   }
 
+  Widget _buildMessageBubble(DocumentSnapshot msg) {
+    bool isMine = msg['senderId'] == currentUserId;
+    String? text = msg['message'];
+    String? imageUrl = msg['imageUrl'];
+    String? audioUrl = msg['audioUrl'];
+    DateTime messageDate =
+        DateTime.fromMillisecondsSinceEpoch(msg['timestamp']);
+
+    return Column(
+      crossAxisAlignment:
+          isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        // Date separator if needed (handled in the main builder)
+        Container(
+          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          decoration: BoxDecoration(
+            color: isMine ? Colors.blue : Colors.grey[300],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (text != null && text.isNotEmpty) Text(text),
+              if (imageUrl != null)
+                Image.network(imageUrl,
+                    width: 200, height: 200, fit: BoxFit.cover),
+              if (audioUrl != null)
+                SizedBox(
+                  width: 235,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.play_arrow),
+                        onPressed: () =>
+                            _player!.startPlayer(fromURI: audioUrl),
+                      ),
+                      _buildAudioWave(),
+                      Text(msg['audioDuration'] ?? '0:00'),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            DateFormat('h:mm a').format(messageDate),
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateSeparator(DateTime date) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        margin: EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          _formatDate(date),
+          style: TextStyle(fontSize: 12, color: Colors.black54),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final messageDay = DateTime(date.year, date.month, date.day);
+
+    if (messageDay == today) {
+      return 'Today';
+    } else if (messageDay == yesterday) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('MMM d, yyyy').format(date);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,69 +323,49 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: firestore
-                  .collection('chats')
-                  .doc(widget.chatId)
-                  .collection('messages')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData)
-                  return Center(child: CircularProgressIndicator());
+                stream: firestore
+                    .collection('chats')
+                    .doc(widget.chatId)
+                    .collection('messages')
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData)
+                    return Center(child: CircularProgressIndicator());
 
-                var messages = snapshot.data!.docs;
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    var msg = messages[index];
-                    bool isMine = msg['senderId'] == currentUserId;
-                    String? text = msg['message'];
-                    String? imageUrl = msg['imageUrl'];
-                    String? audioUrl = msg['audioUrl'];
+                  var messages = snapshot.data!.docs;
+                  List<Widget> messageWidgets = [];
+                  DateTime? currentDate;
 
-                    return Align(
-                      alignment:
-                          isMine ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        margin:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: isMine ? Colors.blue : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (text != null && text.isNotEmpty) Text(text),
-                            if (imageUrl != null)
-                              Image.network(imageUrl,
-                                  width: 200, height: 200, fit: BoxFit.cover),
-                            if (audioUrl != null)
-                              SizedBox(
-                                width: 200,
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.play_arrow),
-                                      onPressed: () => _player!
-                                          .startPlayer(fromURI: audioUrl),
-                                    ),
-                                    _buildAudioWave(),
-                                  ],
-                                ),
-                              ),
-                            Text(msg['audioDuration'] ??
-                                '0:00'), // Display the duration
-                          ],
-                        ),
+                  for (var i = 0; i < messages.length; i++) {
+                    var msg = messages[i];
+                    DateTime messageDate =
+                        DateTime.fromMillisecondsSinceEpoch(msg['timestamp']);
+                    DateTime messageDay = DateTime(
+                        messageDate.year, messageDate.month, messageDate.day);
+
+                    // Add date separator if this is the first message of the day
+                    if (currentDate == null ||
+                        !_isSameDay(currentDate, messageDay)) {
+                      currentDate = messageDay;
+                      messageWidgets.add(_buildDateSeparator(messageDate));
+                    }
+
+                    messageWidgets.add(
+                      Align(
+                        alignment: msg['senderId'] == currentUserId
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: _buildMessageBubble(msg),
                       ),
                     );
-                  },
-                );
-              },
-            ),
+                  }
+
+                  return ListView(
+                    reverse: true,
+                    children: messageWidgets,
+                  );
+                }),
           ),
           if (isUploading) LinearProgressIndicator(),
           Padding(
@@ -324,6 +393,10 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   Widget _buildAudioWave() {

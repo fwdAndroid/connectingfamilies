@@ -61,6 +61,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
